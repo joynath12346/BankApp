@@ -1,26 +1,37 @@
 using Microsoft.AspNetCore.Mvc;
+using bankweb.Data;
+using bankweb.Models;
 
 namespace bankweb.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
-    public class WeatherForecastController : ControllerBase
+    [Route("api/[controller]")]
+    public class UsersController : ControllerBase
     {
-        private static readonly string[] Summaries =
-        [
-            "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-        ];
+        private readonly ApplicationDbContext _context;
 
-        [HttpGet(Name = "GetWeatherForecast")]
-        public IEnumerable<WeatherForecast> Get()
+        public UsersController(ApplicationDbContext context)
         {
-            return Enumerable.Range(1, 5).Select(index => new WeatherForecast
-            {
-                Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-                TemperatureC = Random.Shared.Next(-20, 55),
-                Summary = Summaries[Random.Shared.Next(Summaries.Length)]
-            })
-            .ToArray();
+            _context = context;
+        }
+
+
+        [HttpGet]
+        public IActionResult GetUsers()
+        {
+            var users = _context.Users.ToList();
+
+            return Ok(users);
+        }
+
+
+        [HttpPost]
+        public IActionResult CreateUser(User user)
+        {
+            _context.Users.Add(user);
+            _context.SaveChanges();
+
+            return Ok(user);
         }
     }
 }
