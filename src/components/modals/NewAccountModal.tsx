@@ -16,7 +16,7 @@ export const NewAccountModal: React.FC<NewAccountModalProps> = ({ onClose, onSuc
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('+1 (555) ');
   const [accountType, setAccountType] = useState<AccountType>('checking');
-  const [currency, setCurrency] = useState<Currency>('USD');
+  const [currency, setCurrency] = useState<Currency>('BDT');
   const [initialDeposit, setInitialDeposit] = useState<string>('25000');
   const [overdraftLimit, setOverdraftLimit] = useState<string>('5000');
   const [kycTier, setKycTier] = useState<1 | 2 | 3>(2);
@@ -169,6 +169,7 @@ export const NewAccountModal: React.FC<NewAccountModalProps> = ({ onClose, onSuc
                 onChange={e => setCurrency(e.target.value as Currency)}
                 className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none cursor-pointer"
               >
+                <option value="BDT">BDT - Bangladeshi Taka</option>
                 <option value="USD">USD ($) - United States Dollar</option>
                 <option value="EUR">EUR (€) - European Euro</option>
                 <option value="GBP">GBP (£) - British Pound</option>

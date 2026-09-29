@@ -64,7 +64,7 @@ export const TransactionsLedger: React.FC<TransactionsLedgerProps> = ({
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `Aegis_Bank_Clearing_Ledger_${new Date().toISOString().slice(0, 10)}.csv`;
+    a.download = `BanglaBank_Clearing_Ledger_${new Date().toISOString().slice(0, 10)}.csv`;
     a.click();
   };
 
@@ -104,7 +104,7 @@ export const TransactionsLedger: React.FC<TransactionsLedgerProps> = ({
         <div className="p-3.5 rounded-lg bg-slate-900/80 border border-slate-800">
           <div className="text-[11px] text-slate-400">Total Filtered Volume</div>
           <div className="text-xl font-bold text-white font-mono tabular-nums mt-1">
-            ${totalSettledVolume.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            BDT {totalSettledVolume.toLocaleString('en-BD', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </div>
         </div>
 
@@ -244,7 +244,7 @@ export const TransactionsLedger: React.FC<TransactionsLedgerProps> = ({
                         {tx.currency} {tx.amount.toLocaleString('en-US', { minimumFractionDigits: 2 })}
                       </span>
                       {tx.fee > 0 && (
-                        <div className="text-[10px] text-slate-500">Fee: ${tx.fee.toFixed(2)}</div>
+                        <div className="text-[10px] text-slate-500">Fee: BDT {tx.fee.toFixed(2)}</div>
                       )}
                     </td>
 

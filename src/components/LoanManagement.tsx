@@ -98,7 +98,7 @@ export const LoanManagement: React.FC = () => {
       const res = recordLoanPayment(loanId, amt);
       if (res.success) {
         setPaymentAmountInput('');
-        setActionSuccessMessage(`Payment of $${amt.toLocaleString()} recorded.`);
+        setActionSuccessMessage(`Payment of BDT ${amt.toLocaleString('en-BD')} recorded.`);
       }
     }
     setTimeout(() => setActionSuccessMessage(null), 3000);
@@ -144,7 +144,7 @@ export const LoanManagement: React.FC = () => {
         <div className="p-3.5 rounded-lg bg-slate-900/80 border border-slate-800">
           <div className="text-[11px] text-slate-400">Total Outstanding Principal</div>
           <div className="text-xl font-bold text-white font-mono tabular-nums mt-1">
-            ${totalOutstanding.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+            BDT {totalOutstanding.toLocaleString('en-BD', { minimumFractionDigits: 2 })}
           </div>
         </div>
 
@@ -210,7 +210,7 @@ export const LoanManagement: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-[11px] text-slate-400 mb-1">Principal Amount (USD)</label>
+              <label className="block text-[11px] text-slate-400 mb-1">Principal Amount (BDT)</label>
               <input
                 type="number"
                 step="1000"
@@ -292,7 +292,7 @@ export const LoanManagement: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-[11px] text-slate-400 mb-1">Appraised Collateral Value (USD)</label>
+              <label className="block text-[11px] text-slate-400 mb-1">Appraised Collateral Value (BDT)</label>
               <input
                 type="number"
                 step="1000"
@@ -318,14 +318,14 @@ export const LoanManagement: React.FC = () => {
             <div>
               <div className="text-slate-400 text-[11px]">Monthly Amortization:</div>
               <div className="text-lg font-bold text-emerald-400 font-mono tabular-nums">
-                ${monthlyPayment.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                BDT {monthlyPayment.toLocaleString('en-BD', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </div>
             </div>
 
             <div>
               <div className="text-slate-400 text-[11px]">Total Interest Paid:</div>
               <div className="text-base font-bold text-slate-200 font-mono tabular-nums">
-                ${totalInterest.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                BDT {totalInterest.toLocaleString('en-BD', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </div>
             </div>
 
@@ -388,20 +388,20 @@ export const LoanManagement: React.FC = () => {
                   </td>
 
                   <td className="py-3.5 px-4 text-right font-mono font-medium text-white tabular-nums">
-                    ${loan.requestedAmount.toLocaleString('en-US')}
+                    BDT {loan.requestedAmount.toLocaleString('en-BD')}
                   </td>
 
                   <td className="py-3.5 px-4 text-right font-mono text-slate-300 tabular-nums">
                     <div>{loan.interestRate}% APR</div>
-                    <div className="text-[10px] text-slate-500">{loan.termMonths} mos (${loan.monthlyPayment.toFixed(2)}/mo)</div>
+                    <div className="text-[10px] text-slate-500">{loan.termMonths} mos (BDT {loan.monthlyPayment.toFixed(2)}/mo)</div>
                   </td>
 
                   <td className="py-3.5 px-4 text-right font-mono font-medium tabular-nums">
                     <span className={loan.remainingBalance > 0 ? 'text-amber-400' : 'text-emerald-400'}>
-                      ${loan.remainingBalance.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                      BDT {loan.remainingBalance.toLocaleString('en-BD', { minimumFractionDigits: 2 })}
                     </span>
                     {loan.totalPaid > 0 && (
-                      <div className="text-[10px] text-slate-500">Paid: ${loan.totalPaid.toLocaleString()}</div>
+                      <div className="text-[10px] text-slate-500">Paid: BDT {loan.totalPaid.toLocaleString('en-BD')}</div>
                     )}
                   </td>
 

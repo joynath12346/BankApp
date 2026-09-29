@@ -36,7 +36,7 @@ export const CardsManagement: React.FC<CardsManagementProps> = ({ onOpenNewCardM
   const handleUpdateLimit = (newLimit: number) => {
     if (!selectedCard) return;
     updateCardSettings(selectedCard.id, { dailyLimit: newLimit });
-    setNotice(`Daily limit set to $${newLimit.toLocaleString()}`);
+    setNotice(`Daily limit set to BDT ${newLimit.toLocaleString('en-BD')}`);
     setTimeout(() => setNotice(null), 2500);
   };
 
@@ -118,7 +118,7 @@ export const CardsManagement: React.FC<CardsManagementProps> = ({ onOpenNewCardM
                     <div className="flex items-start justify-between relative z-10">
                       <div>
                         <div className="text-[11px] font-semibold tracking-widest uppercase opacity-80">
-                          Aegis Horizon
+                          BanglaBank
                         </div>
                         <div className="text-[9px] uppercase tracking-wider text-slate-400">
                           {selectedCard.tier.replace('_', ' ')}
@@ -196,7 +196,7 @@ export const CardsManagement: React.FC<CardsManagementProps> = ({ onOpenNewCardM
                       </div>
 
                       <div className="text-[9px] text-slate-400 leading-tight">
-                        Issued by Aegis Horizon Bank NA pursuant to license by Visa USA Inc. Authorized signature required. For lost or stolen cards call +1 (800) 555-0199.
+                        Issued by BanglaBank. Authorized signature required. Contact customer support immediately for lost or stolen cards.
                       </div>
 
                       <div className="pt-2 border-t border-slate-700/60 flex items-center justify-between text-[10px] text-slate-400">
@@ -243,7 +243,7 @@ export const CardsManagement: React.FC<CardsManagementProps> = ({ onOpenNewCardM
                     <span className={`text-[10px] uppercase font-semibold ${c.status === 'active' ? 'text-emerald-400' : 'text-rose-400'}`}>
                       {c.status}
                     </span>
-                    <div className="text-[10px] text-slate-500 font-mono">${c.dailyLimit.toLocaleString()}/day</div>
+                    <div className="text-[10px] text-slate-500 font-mono">BDT {c.dailyLimit.toLocaleString('en-BD')}/day</div>
                   </div>
                 </div>
               ))}
@@ -290,7 +290,7 @@ export const CardsManagement: React.FC<CardsManagementProps> = ({ onOpenNewCardM
                   <span>Daily Spending Ceiling</span>
                 </span>
                 <span className="font-mono text-emerald-400 font-bold tabular-nums">
-                  ${selectedCard.dailyLimit.toLocaleString()} / day
+                  BDT {selectedCard.dailyLimit.toLocaleString('en-BD')} / day
                 </span>
               </div>
 
@@ -305,9 +305,9 @@ export const CardsManagement: React.FC<CardsManagementProps> = ({ onOpenNewCardM
               />
 
               <div className="flex justify-between text-[10px] text-slate-500 font-mono">
-                <span>$500</span>
-                <span>$25,000</span>
-                <span>$50,000</span>
+                <span>BDT 500</span>
+                <span>BDT 25,000</span>
+                <span>BDT 50,000</span>
               </div>
             </div>
 

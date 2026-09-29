@@ -1,5 +1,5 @@
 {
-  "name": "Aegis Horizon Bank Management System",
+  "name": "BanglaBank Management System",
   "description": "Enterprise bank management portal for customer accounts, wire clearing, credit facilities, card issuing, AML compliance, and branch vault operations.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]

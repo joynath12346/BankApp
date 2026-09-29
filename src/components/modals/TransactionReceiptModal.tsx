@@ -59,7 +59,7 @@ export const TransactionReceiptModal: React.FC<TransactionReceiptModalProps> = (
           {/* Bank Seal & Document Header */}
           <div className="p-4 rounded-xl bg-slate-950 border border-slate-800 text-center space-y-1 relative overflow-hidden">
             <div className="text-xs uppercase tracking-widest font-bold text-white">
-              Aegis Horizon Bank National Association
+              BanglaBank
             </div>
             <div className="text-[11px] text-slate-400">
               Interbank Clearing Desk · Federal Reserve District 02
@@ -130,7 +130,7 @@ export const TransactionReceiptModal: React.FC<TransactionReceiptModalProps> = (
 
             <div className="flex justify-between py-1.5 border-b border-slate-800/80">
               <span className="text-slate-400">Transaction Fee:</span>
-              <span className="font-mono text-slate-300">${transaction.fee.toFixed(2)}</span>
+              <span className="font-mono text-slate-300">BDT {transaction.fee.toFixed(2)}</span>
             </div>
           </div>
 

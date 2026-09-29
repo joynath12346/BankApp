@@ -32,7 +32,7 @@ export const DepositWithdrawModal: React.FC<DepositWithdrawModalProps> = ({
     if (mode === 'deposit') {
       const ok = depositFunds(account.id, num, `${method}: ${memo}`);
       if (ok) {
-        setStatusMsg({ type: 'success', text: `Successfully deposited $${num.toLocaleString()} to account.` });
+        setStatusMsg({ type: 'success', text: `Successfully deposited BDT ${num.toLocaleString('en-BD')} to account.` });
         setTimeout(() => onClose(), 1500);
       } else {
         setStatusMsg({ type: 'error', text: 'Deposit failed. Account might be frozen.' });
@@ -40,7 +40,7 @@ export const DepositWithdrawModal: React.FC<DepositWithdrawModalProps> = ({
     } else {
       const res = withdrawFunds(account.id, num, `${method}: ${memo}`);
       if (res.success) {
-        setStatusMsg({ type: 'success', text: `Successfully processed withdrawal of $${num.toLocaleString()}.` });
+        setStatusMsg({ type: 'success', text: `Successfully processed withdrawal of BDT ${num.toLocaleString('en-BD')}.` });
         setTimeout(() => onClose(), 1500);
       } else {
         setStatusMsg({ type: 'error', text: res.message || 'Withdrawal rejected.' });
@@ -129,7 +129,7 @@ export const DepositWithdrawModal: React.FC<DepositWithdrawModalProps> = ({
             <div className="text-right">
               <div className="text-slate-400 text-[10px]">Available Balance</div>
               <div className="font-mono font-bold text-emerald-400 tabular-nums">
-                ${account.availableBalance.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                BDT {account.availableBalance.toLocaleString('en-BD', { minimumFractionDigits: 2 })}
               </div>
             </div>
           </div>

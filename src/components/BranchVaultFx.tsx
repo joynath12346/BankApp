@@ -19,7 +19,7 @@ export const BranchVaultFx: React.FC = () => {
 
   // FX Converter State
   const [amountInput, setAmountInput] = useState<number>(10000);
-  const [fromCurrency, setFromCurrency] = useState<Currency>('USD');
+  const [fromCurrency, setFromCurrency] = useState<Currency>('BDT');
   const [toCurrency, setToCurrency] = useState<Currency>('EUR');
 
   // EOD Reconciliation State
@@ -74,11 +74,11 @@ export const BranchVaultFx: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="p-4 rounded-xl bg-slate-900/80 border border-slate-800">
           <div className="flex items-center justify-between text-xs text-slate-400 mb-1">
-            <span>Physical Vault Reserve (USD)</span>
+            <span>Physical Vault Reserve (BDT)</span>
             <Vault className="w-4 h-4 text-blue-400" />
           </div>
           <div className="text-2xl font-bold text-white font-mono tabular-nums">
-            ${vault.vaultCashUSD.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+            BDT {vault.vaultCashUSD.toLocaleString('en-BD', { minimumFractionDigits: 2 })}
           </div>
           <div className="text-xs text-slate-500 mt-2">Class 3 High-Security Dual Key Vault</div>
         </div>
@@ -89,7 +89,7 @@ export const BranchVaultFx: React.FC = () => {
             <Coins className="w-4 h-4 text-indigo-400" />
           </div>
           <div className="text-2xl font-bold text-white font-mono tabular-nums">
-            ${vault.tellerDrawersCashUSD.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+            BDT {vault.tellerDrawersCashUSD.toLocaleString('en-BD', { minimumFractionDigits: 2 })}
           </div>
           <div className="text-xs text-slate-500 mt-2">Active cash across 6 teller stations</div>
         </div>
@@ -100,7 +100,7 @@ export const BranchVaultFx: React.FC = () => {
             <Building2 className="w-4 h-4 text-emerald-400" />
           </div>
           <div className="text-2xl font-bold text-emerald-400 font-mono tabular-nums">
-            ${vault.centralBankDepositUSD.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+            BDT {vault.centralBankDepositUSD.toLocaleString('en-BD', { minimumFractionDigits: 2 })}
           </div>
           <div className="text-xs text-slate-500 mt-2">
             Statutory Reserve Ratio: {(vault.reserveRequirementRatio * 100).toFixed(1)}% (Compliant)
@@ -128,7 +128,7 @@ export const BranchVaultFx: React.FC = () => {
               <thead className="bg-slate-950/60 text-slate-400 uppercase tracking-wider text-[11px] border-b border-slate-800">
                 <tr>
                   <th className="py-2.5 px-3">Currency</th>
-                  <th className="py-2.5 px-3 text-right">USD Equivalent</th>
+                  <th className="py-2.5 px-3 text-right">BDT Equivalent</th>
                   <th className="py-2.5 px-3 text-right">Bank Buy Rate</th>
                   <th className="py-2.5 px-3 text-right">Bank Sell Rate</th>
                   <th className="py-2.5 px-3 text-right">24h Change</th>
@@ -146,15 +146,15 @@ export const BranchVaultFx: React.FC = () => {
                     </td>
 
                     <td className="py-3 px-3 text-right font-mono tabular-nums text-white">
-                      ${rate.rateToUSD.toFixed(4)}
+                      BDT {rate.rateToUSD.toFixed(4)}
                     </td>
 
                     <td className="py-3 px-3 text-right font-mono tabular-nums text-slate-300">
-                      ${rate.buyRate.toFixed(4)}
+                      BDT {rate.buyRate.toFixed(4)}
                     </td>
 
                     <td className="py-3 px-3 text-right font-mono tabular-nums text-slate-300">
-                      ${rate.sellRate.toFixed(4)}
+                      BDT {rate.sellRate.toFixed(4)}
                     </td>
 
                     <td className="py-3 px-3 text-right font-mono tabular-nums">
@@ -194,6 +194,7 @@ export const BranchVaultFx: React.FC = () => {
                   onChange={e => setFromCurrency(e.target.value as Currency)}
                   className="w-full bg-slate-900 border border-slate-800 rounded px-2.5 py-1.5 text-xs text-white focus:outline-none cursor-pointer"
                 >
+                  <option value="BDT">BDT - Bangladeshi Taka</option>
                   <option value="USD">USD - US Dollar</option>
                   <option value="EUR">EUR - Euro</option>
                   <option value="GBP">GBP - British Pound</option>
@@ -210,6 +211,7 @@ export const BranchVaultFx: React.FC = () => {
                   className="w-full bg-slate-900 border border-slate-800 rounded px-2.5 py-1.5 text-xs text-white focus:outline-none cursor-pointer"
                 >
                   <option value="EUR">EUR - Euro</option>
+                  <option value="BDT">BDT - Bangladeshi Taka</option>
                   <option value="USD">USD - US Dollar</option>
                   <option value="GBP">GBP - British Pound</option>
                   <option value="CAD">CAD - Canadian Dollar</option>
@@ -242,7 +244,7 @@ export const BranchVaultFx: React.FC = () => {
               <div className="flex justify-between text-slate-400">
                 <span>Theoretical Vault Balance:</span>
                 <span className="font-mono text-white font-medium">
-                  ${vault.vaultCashUSD.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                  BDT {vault.vaultCashUSD.toLocaleString('en-BD', { minimumFractionDigits: 2 })}
                 </span>
               </div>
               <div className="flex justify-between text-slate-400">
@@ -257,7 +259,7 @@ export const BranchVaultFx: React.FC = () => {
 
             <div>
               <label className="block text-xs font-medium text-slate-300 mb-1">
-                Physically Counted Vault Total (USD)
+                Physically Counted Vault Total (BDT)
               </label>
               <input
                 type="number"
@@ -289,7 +291,7 @@ export const BranchVaultFx: React.FC = () => {
               <span className={`font-mono font-bold tabular-nums ${
                 variance === 0 ? 'text-emerald-400' : 'text-rose-400'
               }`}>
-                ${variance.toFixed(2)} {variance === 0 ? '(Balanced)' : '(Discrepancy)'}
+                BDT {variance.toFixed(2)} {variance === 0 ? '(Balanced)' : '(Discrepancy)'}
               </span>
             </div>
 

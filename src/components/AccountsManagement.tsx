@@ -157,6 +157,7 @@ export const AccountsManagement: React.FC<AccountsManagementProps> = ({
             className="bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-2 text-xs text-slate-300 focus:outline-none cursor-pointer"
           >
             <option value="all">All Currencies</option>
+            <option value="BDT">BDT - Bangladeshi Taka</option>
             <option value="USD">USD ($)</option>
             <option value="EUR">EUR (€)</option>
             <option value="GBP">GBP (£)</option>

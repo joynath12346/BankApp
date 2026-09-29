@@ -126,12 +126,20 @@ const STORAGE_KEYS = {
 export const BankProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [accounts, setAccounts] = useState<BankAccount[]>(() => {
     const saved = localStorage.getItem(STORAGE_KEYS.ACCOUNTS);
-    return saved ? JSON.parse(saved) : INITIAL_ACCOUNTS;
+    const loaded: BankAccount[] = saved ? JSON.parse(saved) : INITIAL_ACCOUNTS;
+    return loaded.map(account => ({
+      ...account,
+      currency: account.currency === 'USD' ? 'BDT' : account.currency
+    }));
   });
 
   const [transactions, setTransactions] = useState<Transaction[]>(() => {
     const saved = localStorage.getItem(STORAGE_KEYS.TRANSACTIONS);
-    return saved ? JSON.parse(saved) : INITIAL_TRANSACTIONS;
+    const loaded: Transaction[] = saved ? JSON.parse(saved) : INITIAL_TRANSACTIONS;
+    return loaded.map(transaction => ({
+      ...transaction,
+      currency: transaction.currency === 'USD' ? 'BDT' : transaction.currency
+    }));
   });
 
   const [loans, setLoans] = useState<LoanApplication[]>(() => {
@@ -146,7 +154,11 @@ export const BankProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const [amlAlerts, setAmlAlerts] = useState<AmlAlert[]>(() => {
     const saved = localStorage.getItem(STORAGE_KEYS.ALERTS);
-    return saved ? JSON.parse(saved) : INITIAL_AML_ALERTS;
+    const loaded: AmlAlert[] = saved ? JSON.parse(saved) : INITIAL_AML_ALERTS;
+    return loaded.map(alert => ({
+      ...alert,
+      currency: alert.currency === 'USD' ? 'BDT' : alert.currency
+    }));
   });
 
   const [vault, setVault] = useState<BranchVaultState>(() => {
@@ -379,9 +391,9 @@ export const BankProvider: React.FC<{ children: React.ReactNode }> = ({ children
       accountHolderName: data.accountHolderName || 'New Account Holder',
       accountHolderEmail: data.accountHolderEmail || 'customer@aegisbank.com',
       accountHolderPhone: data.accountHolderPhone || '+1 (555) 012-3456',
-      companyName: data.companyName,
+      companyName: data.companyName || '',
       type: data.type || 'checking',
-      currency: data.currency || 'USD',
+      currency: data.currency || 'BDT',
       balance: initialBal,
       availableBalance: initialBal,
       holdBalance: 0,
@@ -409,7 +421,7 @@ export const BankProvider: React.FC<{ children: React.ReactNode }> = ({ children
         accountNumber: accNumber,
         accountHolderName: newAcc.accountHolderName,
         counterpartyName: 'Branch Initial Vault Inflow',
-        counterpartyBank: 'Aegis Horizon Bank',
+        counterpartyBank: 'BanglaBank',
         type: 'deposit',
         category: 'Account Funding',
         amount: initialBal,
@@ -463,7 +475,7 @@ export const BankProvider: React.FC<{ children: React.ReactNode }> = ({ children
       accountNumber: acc.accountNumber,
       accountHolderName: acc.accountHolderName,
       counterpartyName: 'Branch Cash / Direct Remittance',
-      counterpartyBank: 'Aegis Horizon Bank',
+      counterpartyBank: 'BanglaBank',
       type: 'deposit',
       category: 'Cash & Remittance Deposit',
       amount: numAmount,
@@ -482,7 +494,7 @@ export const BankProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
 
     // Update branch vault cash
-    const newVaultCash = vault.vaultCashUSD + (acc.currency === 'USD' ? numAmount : numAmount * 1.08);
+    const newVaultCash = vault.vaultCashUSD + (acc.currency === 'BDT' ? numAmount : numAmount * 1.08);
     setVault(v => ({
       ...v,
       vaultCashUSD: newVaultCash
@@ -534,7 +546,7 @@ export const BankProvider: React.FC<{ children: React.ReactNode }> = ({ children
       accountNumber: acc.accountNumber,
       accountHolderName: acc.accountHolderName,
       counterpartyName: 'Teller Cash Drawer #1',
-      counterpartyBank: 'Aegis Horizon Bank',
+      counterpartyBank: 'BanglaBank',
       type: 'withdrawal',
       category: 'Counter Cash Withdrawal',
       amount: numAmount,
@@ -553,7 +565,7 @@ export const BankProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
 
     // Subtract from vault
-    const newVaultCash = Math.max(0, vault.vaultCashUSD - (acc.currency === 'USD' ? numAmount : numAmount * 1.08));
+    const newVaultCash = Math.max(0, vault.vaultCashUSD - (acc.currency === 'BDT' ? numAmount : numAmount * 1.08));
     setVault(v => ({
       ...v,
       vaultCashUSD: newVaultCash
@@ -600,7 +612,7 @@ export const BankProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (numAmount >= 100000) {
       riskScore = 80;
       isFlagged = true;
-      flagReason = 'High value clearing exceeding $100,000 threshold';
+      flagReason = 'High value clearing exceeding BDT 100,000 threshold';
     } else if (targetType === 'international_swift' && numAmount >= 25000) {
       riskScore = 72;
       isFlagged = true;
@@ -608,7 +620,7 @@ export const BankProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } else if (numAmount >= 9000 && numAmount < 10000) {
       riskScore = 88;
       isFlagged = true;
-      flagReason = 'Potential Structuring / BSA Threshold Avoidance ($9,000 - $9,999)';
+      flagReason = 'Potential Structuring / BSA Threshold Avoidance (BDT 9,000 - BDT 9,999)';
     }
 
     const txStatus = isFlagged ? 'flagged' : 'settled';
@@ -655,7 +667,7 @@ export const BankProvider: React.FC<{ children: React.ReactNode }> = ({ children
       targetAccountId,
       targetAccountNumber: targetAccountNumber || 'EXTERNAL-CLEARING',
       counterpartyName,
-      counterpartyBank: counterpartyBank || (targetType === 'internal' ? 'Aegis Horizon Bank' : 'Federal Reserve Bank Wire Network'),
+      counterpartyBank: counterpartyBank || (targetType === 'internal' ? 'BanglaBank' : 'External Bank Network'),
       type: targetType === 'internal' ? 'internal_transfer' : 'wire_clearing',
       category: targetType === 'internal' ? 'Book Transfer' : targetType === 'international_swift' ? 'SWIFT Wire' : 'Fedwire Domestic',
       amount: numAmount,
@@ -695,7 +707,7 @@ export const BankProvider: React.FC<{ children: React.ReactNode }> = ({ children
           targetAccountId: sourceAcc.id,
           targetAccountNumber: sourceAcc.accountNumber,
           counterpartyName: sourceAcc.accountHolderName,
-          counterpartyBank: 'Aegis Horizon Bank',
+          counterpartyBank: 'BanglaBank',
           type: 'internal_transfer',
           category: 'Book Transfer Credit',
           amount: numAmount,
@@ -783,7 +795,7 @@ export const BankProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const newHold = acc.holdBalance + numHold;
     const newAvail = Math.max(0, acc.balance - newHold);
-    const newNotes = `${acc.notes || ''} [Hold applied: $${numHold.toLocaleString()} - ${reason}]`;
+    const newNotes = `${acc.notes || ''} [Hold applied: BDT ${numHold.toLocaleString()} - ${reason}]`;
 
     setAccounts(prev =>
       prev.map(a =>
@@ -939,8 +951,8 @@ export const BankProvider: React.FC<{ children: React.ReactNode }> = ({ children
       accountId: acc.id,
       accountNumber: acc.accountNumber,
       accountHolderName: acc.accountHolderName,
-      counterpartyName: 'Aegis Credit Facilities Desk',
-      counterpartyBank: 'Aegis Horizon Bank',
+      counterpartyName: 'BanglaBank Credit Facilities Desk',
+      counterpartyBank: 'BanglaBank',
       type: 'loan_disbursement',
       category: 'Credit Facility',
       amount: disburseAmt,
@@ -1021,8 +1033,8 @@ export const BankProvider: React.FC<{ children: React.ReactNode }> = ({ children
         accountId: acc.id,
         accountNumber: acc.accountNumber,
         accountHolderName: acc.accountHolderName,
-        counterpartyName: 'Aegis Loan Servicing Escrow',
-        counterpartyBank: 'Aegis Horizon Bank',
+        counterpartyName: 'BanglaBank Loan Servicing Escrow',
+        counterpartyBank: 'BanglaBank',
         type: 'loan_repayment',
         category: 'Debt Amortization',
         amount: numAmt,

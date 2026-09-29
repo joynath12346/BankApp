@@ -1,20 +1,24 @@
 import React from 'react';
 import { useBank } from '../context/BankContext';
 import { UserRole } from '../types/bank';
-import { ArrowLeftRight, Plus, RefreshCw, ShieldAlert, Building2, User } from 'lucide-react';
+import { ArrowLeftRight, LogOut, Plus, RefreshCw } from 'lucide-react';
 
 interface HeaderProps {
   currentTab: string;
   setCurrentTab: (tab: string) => void;
   onOpenTransferModal: () => void;
   onOpenNewAccountModal: () => void;
+  onLogout: () => void;
+  isCustomerSession?: boolean;
 }
 
 export const Header: React.FC<HeaderProps> = ({
   currentTab,
   setCurrentTab,
   onOpenTransferModal,
-  onOpenNewAccountModal
+  onOpenNewAccountModal,
+  onLogout,
+  isCustomerSession = false
 }) => {
   const { currentRole, setCurrentRole, amlAlerts, accounts, activeCustomerAccountId, setActiveCustomerAccountId, resetDemoData, isDbConnected, dbSyncStatus } = useBank();
 
@@ -27,8 +31,7 @@ export const Header: React.FC<HeaderProps> = ({
     { id: 'loans', label: 'Credit Facilities' },
     { id: 'compliance', label: 'Risk & AML' },
     { id: 'cards', label: 'Card Fleet' },
-    { id: 'vault', label: 'Vault & FX' },
-    { id: 'django', label: 'Django Stack' }
+    { id: 'vault', label: 'Vault & FX' }
   ];
 
   return (
@@ -41,7 +44,7 @@ export const Header: React.FC<HeaderProps> = ({
         >
           <span className="text-base font-bold tracking-tight text-white flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-blue-500 ring-4 ring-blue-500/20 inline-block" />
-            Aegis Horizon
+            BanglaBank
           </span>
         </button>
         <span className="text-xs text-slate-500 hidden sm:inline-block">· Institutional Core Banking</span>
@@ -54,7 +57,7 @@ export const Header: React.FC<HeaderProps> = ({
       </div>
 
       {/* Zone 2: Clean 4-6 text navigation links */}
-      <nav className="hidden lg:flex items-center gap-6 text-sm font-medium text-slate-400">
+      <nav className={`${isCustomerSession ? 'hidden' : 'hidden lg:flex'} items-center gap-6 text-sm font-medium text-slate-400`}>
         {navItems.map(item => {
           const isActive = currentTab === item.id && currentRole !== 'client';
           return (
@@ -85,7 +88,7 @@ export const Header: React.FC<HeaderProps> = ({
       {/* Zone 3: 1-2 Primary Actions & Role Switcher */}
       <div className="flex items-center gap-3">
         {/* Role Switcher */}
-        <div className="flex items-center gap-2 bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs">
+        {!isCustomerSession && <div className="flex items-center gap-2 bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs">
           <span className="text-slate-400 text-[11px] uppercase tracking-wider hidden sm:inline">Role:</span>
           <select
             value={currentRole}
@@ -105,10 +108,10 @@ export const Header: React.FC<HeaderProps> = ({
             <option value="compliance" className="bg-slate-900 text-white">Risk & AML Officer</option>
             <option value="client" className="bg-slate-900 text-white">Customer Portal View</option>
           </select>
-        </div>
+        </div>}
 
         {/* If in client mode, quick account selector */}
-        {currentRole === 'client' && (
+        {currentRole === 'client' && !isCustomerSession && (
           <div className="hidden md:flex items-center gap-1.5 bg-slate-900 border border-slate-800 rounded-lg px-2 py-1.5 text-xs">
             <span className="text-slate-400 text-[11px]">Account:</span>
             <select
@@ -161,6 +164,14 @@ export const Header: React.FC<HeaderProps> = ({
           className="p-1.5 text-slate-400 hover:text-slate-200 rounded hover:bg-slate-800/60 transition-colors cursor-pointer"
         >
           <RefreshCw className="w-3.5 h-3.5" />
+        </button>
+
+        <button
+          onClick={onLogout}
+          title="Sign out"
+          className="p-1.5 text-slate-400 hover:text-red-300 rounded hover:bg-red-500/10 transition-colors cursor-pointer"
+        >
+          <LogOut className="w-3.5 h-3.5" />
         </button>
       </div>
     </header>

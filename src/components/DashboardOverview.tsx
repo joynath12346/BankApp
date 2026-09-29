@@ -116,7 +116,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
             <Landmark className="w-4 h-4 text-blue-400" />
           </div>
           <div className="text-2xl font-bold tracking-tight text-white tabular-nums">
-            ${totalDepositsUSD.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            BDT {totalDepositsUSD.toLocaleString('en-BD', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </div>
           <div className="flex items-center gap-2 mt-2 text-xs text-slate-400">
             <span className="text-emerald-400 font-medium">+3.4% this month</span>
@@ -132,7 +132,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
             <BadgeDollarSign className="w-4 h-4 text-indigo-400" />
           </div>
           <div className="text-2xl font-bold tracking-tight text-white tabular-nums">
-            ${totalLoansBooked.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            BDT {totalLoansBooked.toLocaleString('en-BD', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </div>
           <div className="flex items-center gap-2 mt-2 text-xs text-slate-400">
             <span className="text-indigo-400 font-medium">{pendingLoanCount} in underwriting</span>
@@ -148,7 +148,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
             <Vault className="w-4 h-4 text-emerald-400" />
           </div>
           <div className="text-2xl font-bold tracking-tight text-white tabular-nums">
-            ${vault.vaultCashUSD.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            BDT {vault.vaultCashUSD.toLocaleString('en-BD', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </div>
           <div className="flex items-center gap-2 mt-2 text-xs text-slate-400">
             <span className="text-emerald-400 font-medium">LCR: 142%</span>
@@ -164,7 +164,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
             <TrendingUp className="w-4 h-4 text-amber-400" />
           </div>
           <div className="text-2xl font-bold tracking-tight text-white tabular-nums">
-            ${dailyVolumeUSD.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            BDT {dailyVolumeUSD.toLocaleString('en-BD', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </div>
           <div className="flex items-center gap-2 mt-2 text-xs text-slate-400">
             {pendingAmlCount > 0 ? (
@@ -210,7 +210,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
                   <span className="w-2 h-2 rounded-full bg-blue-500 inline-block" />
                   <span>Escrow</span>
                 </div>
-                <div className="font-semibold text-white tabular-nums">${(escrowSum / 1000000).toFixed(2)}M</div>
+                <div className="font-semibold text-white tabular-nums">BDT {(escrowSum / 1000000).toFixed(2)}M</div>
                 <div className="text-[11px] text-slate-500">{escrowPct}% of book</div>
               </div>
 
@@ -219,7 +219,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
                   <span className="w-2 h-2 rounded-full bg-indigo-500 inline-block" />
                   <span>Checking</span>
                 </div>
-                <div className="font-semibold text-white tabular-nums">${(checkingSum / 1000000).toFixed(2)}M</div>
+                <div className="font-semibold text-white tabular-nums">BDT {(checkingSum / 1000000).toFixed(2)}M</div>
                 <div className="text-[11px] text-slate-500">{checkingPct}% of book</div>
               </div>
 
@@ -228,7 +228,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
                   <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" />
                   <span>Savings</span>
                 </div>
-                <div className="font-semibold text-white tabular-nums">${(savingsSum / 1000000).toFixed(2)}M</div>
+                <div className="font-semibold text-white tabular-nums">BDT {(savingsSum / 1000000).toFixed(2)}M</div>
                 <div className="text-[11px] text-slate-500">{savingsPct}% of book</div>
               </div>
             </div>
@@ -236,7 +236,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
 
           <div className="mt-5 p-3 rounded-lg bg-slate-950/60 border border-slate-800 text-xs flex items-center justify-between">
             <span className="text-slate-400">Statutory Reserve Requirement:</span>
-            <span className="font-mono text-white font-medium">10.0% ($828,500 held at Fed)</span>
+            <span className="font-mono text-white font-medium">10.0% (BDT 828,500 reserve held)</span>
           </div>
         </div>
 

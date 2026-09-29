@@ -73,7 +73,7 @@ export const TransferModal: React.FC<TransferModalProps> = ({ onClose, defaultSo
       sourceAccountId: sourceAccount.id,
       targetType: transferType,
       counterpartyName: cName,
-      counterpartyBank: transferType === 'internal' ? 'Aegis Horizon Bank' : counterpartyBank,
+      counterpartyBank: transferType === 'internal' ? 'BanglaBank' : counterpartyBank,
       targetAccountNumber: transferType === 'internal' ? targetInternalAccount?.accountNumber : targetAccountNumber,
       targetAccountId: transferType === 'internal' ? targetAccountId : undefined,
       amount: numAmount,
@@ -141,7 +141,7 @@ export const TransferModal: React.FC<TransferModalProps> = ({ onClose, defaultSo
             >
               {accounts.map(acc => (
                 <option key={acc.id} value={acc.id} disabled={acc.status === 'frozen'}>
-                  {acc.accountHolderName} — {acc.accountNumber} (${acc.availableBalance.toLocaleString()} avail)
+                  {acc.accountHolderName} — {acc.accountNumber} (BDT {acc.availableBalance.toLocaleString('en-BD')} avail)
                   {acc.status === 'frozen' ? ' [FROZEN]' : ''}
                 </option>
               ))}
@@ -162,7 +162,7 @@ export const TransferModal: React.FC<TransferModalProps> = ({ onClose, defaultSo
                 }`}
               >
                 <div>Internal Book</div>
-                <div className="text-[10px] text-slate-500">$0.00 fee · Instant</div>
+                <div className="text-[10px] text-slate-500">BDT 0.00 fee · Instant</div>
               </button>
 
               <button
@@ -175,7 +175,7 @@ export const TransferModal: React.FC<TransferModalProps> = ({ onClose, defaultSo
                 }`}
               >
                 <div>Fedwire RTGS</div>
-                <div className="text-[10px] text-slate-500">$25.00 fee · Real-Time</div>
+                <div className="text-[10px] text-slate-500">BDT 25.00 fee · Real-Time</div>
               </button>
 
               <button
@@ -188,7 +188,7 @@ export const TransferModal: React.FC<TransferModalProps> = ({ onClose, defaultSo
                 }`}
               >
                 <div>SWIFT GPI</div>
-                <div className="text-[10px] text-slate-500">$45.00 fee · Cross-Border</div>
+                <div className="text-[10px] text-slate-500">BDT 45.00 fee · Cross-Border</div>
               </button>
             </div>
           </div>
@@ -196,7 +196,7 @@ export const TransferModal: React.FC<TransferModalProps> = ({ onClose, defaultSo
           {/* Internal Destination vs External Destination */}
           {transferType === 'internal' ? (
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">Beneficiary Aegis Account</label>
+              <label className="block text-xs font-medium text-slate-300 mb-1">Beneficiary BanglaBank Account</label>
               <select
                 value={targetAccountId}
                 onChange={e => setTargetAccountId(e.target.value)}
@@ -271,7 +271,7 @@ export const TransferModal: React.FC<TransferModalProps> = ({ onClose, defaultSo
           {/* Amount & Memo */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">Transfer Amount (USD)</label>
+              <label className="block text-xs font-medium text-slate-300 mb-1">Transfer Amount (BDT)</label>
               <input
                 type="number"
                 step="0.01"
@@ -302,8 +302,8 @@ export const TransferModal: React.FC<TransferModalProps> = ({ onClose, defaultSo
                 <div className="font-semibold">Automated AML Surveillance Notice</div>
                 <div className="text-[11px] text-amber-300/80 mt-0.5">
                   {isStructuringSuspect
-                    ? 'Amount ($9,000–$9,999) triggers Bank Secrecy Act structuring screening algorithm.'
-                    : 'Transaction exceeds $100,000 threshold and will be logged in regulatory clearing reports.'}
+                    ? 'Amount (BDT 9,000–BDT 9,999) triggers transaction-structuring screening.'
+                    : 'Transaction exceeds BDT 100,000 and will be logged in regulatory clearing reports.'}
                 </div>
               </div>
             </div>
@@ -313,15 +313,15 @@ export const TransferModal: React.FC<TransferModalProps> = ({ onClose, defaultSo
           <div className="p-3.5 rounded-lg bg-slate-950 border border-slate-800 text-xs space-y-1.5 font-mono">
             <div className="flex justify-between text-slate-400">
               <span>Transfer Principal:</span>
-              <span className="text-white">${numAmount.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
+              <span className="text-white">BDT {numAmount.toLocaleString('en-BD', { minimumFractionDigits: 2 })}</span>
             </div>
             <div className="flex justify-between text-slate-400">
               <span>Clearing Fee:</span>
-              <span className="text-slate-300">${fee.toFixed(2)}</span>
+              <span className="text-slate-300">BDT {fee.toFixed(2)}</span>
             </div>
             <div className="pt-1.5 border-t border-slate-800 flex justify-between font-bold text-white">
               <span>Total Debit from Account:</span>
-              <span className="text-emerald-400">${totalDeduction.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
+              <span className="text-emerald-400">BDT {totalDeduction.toLocaleString('en-BD', { minimumFractionDigits: 2 })}</span>
             </div>
           </div>
 

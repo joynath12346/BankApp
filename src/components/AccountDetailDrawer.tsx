@@ -157,28 +157,28 @@ export const AccountDetailDrawer: React.FC<AccountDetailDrawerProps> = ({
             <div className="p-3.5 rounded-lg bg-slate-950/60 border border-slate-800">
               <div className="text-[11px] text-slate-400">Ledger Balance</div>
               <div className="text-lg font-bold text-white font-mono tabular-nums mt-1">
-                ${account.balance.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                BDT {account.balance.toLocaleString('en-BD', { minimumFractionDigits: 2 })}
               </div>
             </div>
 
             <div className="p-3.5 rounded-lg bg-slate-950/60 border border-slate-800">
               <div className="text-[11px] text-slate-400">Available Funds</div>
               <div className="text-lg font-bold text-emerald-400 font-mono tabular-nums mt-1">
-                ${account.availableBalance.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                BDT {account.availableBalance.toLocaleString('en-BD', { minimumFractionDigits: 2 })}
               </div>
             </div>
 
             <div className="p-3.5 rounded-lg bg-slate-950/60 border border-slate-800">
               <div className="text-[11px] text-slate-400">Hold / Collateral</div>
               <div className="text-lg font-bold text-amber-400 font-mono tabular-nums mt-1">
-                ${account.holdBalance.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                BDT {account.holdBalance.toLocaleString('en-BD', { minimumFractionDigits: 2 })}
               </div>
             </div>
 
             <div className="p-3.5 rounded-lg bg-slate-950/60 border border-slate-800">
               <div className="text-[11px] text-slate-400">Overdraft Line</div>
               <div className="text-lg font-bold text-slate-200 font-mono tabular-nums mt-1">
-                ${account.overdraftLimit.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                BDT {account.overdraftLimit.toLocaleString('en-BD', { minimumFractionDigits: 2 })}
               </div>
             </div>
           </div>
@@ -218,7 +218,7 @@ export const AccountDetailDrawer: React.FC<AccountDetailDrawerProps> = ({
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[11px] text-slate-400 mb-1">Hold Amount (USD)</label>
+                  <label className="block text-[11px] text-slate-400 mb-1">Hold Amount (BDT)</label>
                   <input
                     type="number"
                     step="0.01"
@@ -258,7 +258,7 @@ export const AccountDetailDrawer: React.FC<AccountDetailDrawerProps> = ({
           {account.holdBalance > 0 && !showHoldForm && (
             <div className="p-3 bg-amber-500/10 border border-amber-500/20 rounded-lg flex items-center justify-between text-xs">
               <span className="text-amber-200">
-                Active Hold Balance: <strong>${account.holdBalance.toLocaleString()}</strong>
+                Active Hold Balance: <strong>BDT {account.holdBalance.toLocaleString('en-BD')}</strong>
               </span>
               <button
                 onClick={() => releaseAccountHold(account.id, account.holdBalance)}
@@ -300,7 +300,7 @@ export const AccountDetailDrawer: React.FC<AccountDetailDrawerProps> = ({
                     </div>
                     <div className="text-[11px] text-slate-400 flex items-center justify-between">
                       <span>Exp: {c.expMonth}/{c.expYear}</span>
-                      <span>Daily: ${c.dailyLimit.toLocaleString()}</span>
+                      <span>Daily: BDT {c.dailyLimit.toLocaleString('en-BD')}</span>
                     </div>
                     <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between">
                       <button
@@ -350,7 +350,7 @@ export const AccountDetailDrawer: React.FC<AccountDetailDrawerProps> = ({
 
                       <div className="text-right">
                         <div className={`font-mono font-medium tabular-nums ${isDebit ? 'text-slate-200' : 'text-emerald-400'}`}>
-                          {isDebit ? '-' : '+'}${tx.amount.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                          {isDebit ? '-' : '+'}BDT {tx.amount.toLocaleString('en-BD', { minimumFractionDigits: 2 })}
                         </div>
                         <div className="text-[10px] text-slate-500 capitalize">{tx.status}</div>
                       </div>

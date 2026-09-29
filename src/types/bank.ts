@@ -7,7 +7,7 @@ export type AccountType =
 
 export type AccountStatus = 'active' | 'frozen' | 'dormant' | 'restricted';
 
-export type Currency = 'USD' | 'EUR' | 'GBP' | 'JPY' | 'CAD';
+export type Currency = 'BDT' | 'USD' | 'EUR' | 'GBP' | 'JPY' | 'CAD';
 
 export interface BankAccount {
   id: string;

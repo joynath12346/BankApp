@@ -113,7 +113,7 @@ export const NewCardModal: React.FC<NewCardModalProps> = ({ onClose, defaultAcco
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1">Daily Spending Limit (USD)</label>
+            <label className="block text-xs font-medium text-slate-300 mb-1">Daily Spending Limit (BDT)</label>
             <input
               type="number"
               step="1000"
