@@ -47,6 +47,16 @@ function normalizeAlert(item: any): AmlAlert {
   return { ...item, accountId: item.accountId || item.account };
 }
 
+function normalizeVault(item: any): BranchVaultState {
+  return {
+    ...item,
+    vaultCashUSD: item.vaultCashUSD ?? item.vaultCashUsd,
+    tellerDrawersCashUSD: item.tellerDrawersCashUSD ?? item.tellerDrawersCashUsd,
+    centralBankDepositUSD: item.centralBankDepositUSD ?? item.centralBankDepositUsd,
+    reserveRequirementRatio: item.reserveRequirementRatio ?? item.reserveRequirementRatio
+  };
+}
+
 export async function loadBankSnapshot() {
   const [accounts, transactions, loans, cards, amlAlerts, vault, exchangeRates] = await Promise.all([
     request<BankAccount[] | { results: BankAccount[] }>('/accounts/'),
@@ -63,7 +73,7 @@ export async function loadBankSnapshot() {
     loans: results(loans).map(normalizeLoan),
     cards: results(cards).map(normalizeCard),
     amlAlerts: results(amlAlerts).map(normalizeAlert),
-    vault,
+    vault: normalizeVault(vault),
     exchangeRates: results(exchangeRates)
   };
 }
