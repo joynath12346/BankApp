@@ -20,7 +20,6 @@ services:
         generateValue: true
   - type: web
     name: aegis-bank-frontend
-    plan: free
     runtime: static
     buildCommand: npm ci && npm run build
     staticPublishPath: dist
