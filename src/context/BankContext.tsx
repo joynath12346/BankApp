@@ -33,6 +33,7 @@ import {
   writeBatch
 } from 'firebase/firestore';
 import { handleFirestoreError, OperationType } from '../services/firestoreErrors';
+import { loadBankSnapshot } from '../services/bankApi';
 
 interface BankContextType {
   accounts: BankAccount[];
@@ -166,7 +167,7 @@ export const BankProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return saved ? JSON.parse(saved) : INITIAL_BRANCH_VAULT;
   });
 
-  const [exchangeRates] = useState<ExchangeRate[]>(INITIAL_EXCHANGE_RATES);
+  const [exchangeRates, setExchangeRates] = useState<ExchangeRate[]>(INITIAL_EXCHANGE_RATES);
   const [currentRole, setCurrentRole] = useState<UserRole>(() => {
     const saved = localStorage.getItem(STORAGE_KEYS.ROLE);
     return (saved as UserRole) || 'director';
@@ -181,6 +182,33 @@ export const BankProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isDbConnected, setIsDbConnected] = useState<boolean>(false);
   const [dbSyncStatus, setDbSyncStatus] = useState<'synced' | 'connecting' | 'offline'>('connecting');
   const isInitialSeeded = useRef<boolean>(false);
+
+  // Django REST API is the authoritative source when it is available. Local state
+  // remains as a fast offline cache so the portal still opens during API downtime.
+  useEffect(() => {
+    let cancelled = false;
+    setDbSyncStatus('connecting');
+    loadBankSnapshot()
+      .then(snapshot => {
+        if (cancelled) return;
+        if (snapshot.accounts.length) setAccounts(snapshot.accounts);
+        if (snapshot.transactions.length) setTransactions(snapshot.transactions);
+        if (snapshot.loans.length) setLoans(snapshot.loans);
+        if (snapshot.cards.length) setCards(snapshot.cards);
+        if (snapshot.amlAlerts.length) setAmlAlerts(snapshot.amlAlerts);
+        if (snapshot.exchangeRates.length) setExchangeRates(snapshot.exchangeRates);
+        if (snapshot.vault) setVault(snapshot.vault);
+        setIsDbConnected(true);
+        setDbSyncStatus('synced');
+      })
+      .catch(error => {
+        if (cancelled) return;
+        console.warn('Django API unavailable; using offline cache:', error);
+        setIsDbConnected(false);
+        setDbSyncStatus('offline');
+      });
+    return () => { cancelled = true; };
+  }, []);
 
   // Firestore Seed & Real-Time Synchronization
   useEffect(() => {
