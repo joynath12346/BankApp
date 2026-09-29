@@ -1,6 +1,8 @@
 import { BankAccount, BankCard, BranchVaultState, ExchangeRate, LoanApplication, AmlAlert, Transaction } from '../types/bank';
 
-const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api/v1').replace(/\/$/, '');
+const configuredApiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+const apiOrigin = configuredApiUrl.startsWith('http') ? configuredApiUrl : `https://${configuredApiUrl}`;
+const API_BASE_URL = `${apiOrigin.replace(/\/$/, '')}${apiOrigin.endsWith('/api/v1') ? '' : '/api/v1'}`;
 
 function camelize(value: unknown): any {
   if (Array.isArray(value)) return value.map(camelize);
