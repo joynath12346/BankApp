@@ -1,5 +1,5 @@
 import React, { FormEvent, useEffect, useState } from 'react';
-import { Building2, LockKeyhole, UserPlus } from 'lucide-react';
+import { Building2, LockKeyhole, Moon, Sun, UserPlus } from 'lucide-react';
 import { BankProvider, useBank } from './context/BankContext';
 import { Header } from './components/Header';
 import { DashboardOverview } from './components/DashboardOverview';
@@ -22,6 +22,8 @@ import { BankAccount, Transaction } from './types/bank';
 
 const AUTH_SESSION_KEY = 'aegis_authenticated_user';
 const CUSTOMER_USERS_KEY = 'aegis_customer_users';
+const THEME_KEY = 'banglabank_theme';
+type Theme = 'light' | 'dark';
 
 type AuthSession =
   | { kind: 'admin'; name: string }
@@ -51,7 +53,7 @@ function readAuthSession(): AuthSession | null {
   }
 }
 
-function AccessPortal({ onLogin }: { onLogin: (session: AuthSession) => void }) {
+function AccessPortal({ onLogin, theme, onToggleTheme }: { onLogin: (session: AuthSession) => void; theme: Theme; onToggleTheme: () => void }) {
   const { createAccount } = useBank();
   const [mode, setMode] = useState<'login' | 'register'>('login');
   const [username, setUsername] = useState('');
@@ -118,7 +120,15 @@ function AccessPortal({ onLogin }: { onLogin: (session: AuthSession) => void }) 
   };
 
   return (
-    <main className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center p-6">
+    <main className={`${theme === 'light' ? 'light-theme' : ''} min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center p-6 relative`}>
+      <button
+        type="button"
+        onClick={onToggleTheme}
+        title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+        className="absolute right-5 top-5 rounded-lg border border-slate-700 bg-slate-900 p-2.5 text-slate-300 transition hover:text-white"
+      >
+        {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+      </button>
       <div className="w-full max-w-md rounded-2xl border border-slate-800 bg-slate-900/80 p-8 shadow-2xl shadow-blue-950/20">
         <div className="mb-8 flex items-center gap-3">
           <div className="rounded-xl bg-blue-600/15 p-3 text-blue-400">
@@ -199,7 +209,7 @@ function AccessPortal({ onLogin }: { onLogin: (session: AuthSession) => void }) 
   );
 }
 
-function BankPortalContent({ session, onLogout }: { session: AuthSession; onLogout: () => void }) {
+function BankPortalContent({ session, onLogout, theme, onToggleTheme }: { session: AuthSession; onLogout: () => void; theme: Theme; onToggleTheme: () => void }) {
   const { currentRole, setCurrentRole, accounts, setActiveCustomerAccountId } = useBank();
   const [currentTab, setCurrentTab] = useState<string>(session.kind === 'customer' ? 'client_portal' : 'overview');
 
@@ -245,7 +255,7 @@ function BankPortalContent({ session, onLogout }: { session: AuthSession; onLogo
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans">
+    <div className={`${theme === 'light' ? 'light-theme' : ''} min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans`}>
       {/* 3-Zone Header Contract */}
       <Header
         currentTab={currentTab}
@@ -254,6 +264,8 @@ function BankPortalContent({ session, onLogout }: { session: AuthSession; onLogo
         onOpenNewAccountModal={() => setIsNewAccountModalOpen(true)}
         onLogout={onLogout}
         isCustomerSession={session.kind === 'customer'}
+        theme={theme}
+        onToggleTheme={onToggleTheme}
       />
 
       {/* Main Content Area */}
@@ -413,13 +425,22 @@ export default function App() {
 
 function AuthenticatedApplication() {
   const [session, setSession] = useState<AuthSession | null>(readAuthSession);
+  const [theme, setTheme] = useState<Theme>(() => (localStorage.getItem(THEME_KEY) === 'light' ? 'light' : 'dark'));
 
-  if (!session) return <AccessPortal onLogin={setSession} />;
+  const toggleTheme = () => {
+    setTheme(current => {
+      const next = current === 'dark' ? 'light' : 'dark';
+      localStorage.setItem(THEME_KEY, next);
+      return next;
+    });
+  };
+
+  if (!session) return <AccessPortal onLogin={setSession} theme={theme} onToggleTheme={toggleTheme} />;
 
   const handleLogout = () => {
     sessionStorage.removeItem(AUTH_SESSION_KEY);
     setSession(null);
   };
 
-  return <BankPortalContent session={session} onLogout={handleLogout} />;
+  return <BankPortalContent session={session} onLogout={handleLogout} theme={theme} onToggleTheme={toggleTheme} />;
 }

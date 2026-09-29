@@ -30,3 +30,66 @@
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(148, 163, 184, 0.4);
 }
+
+/* Light mode palette for the existing utility-based interface. */
+.light-theme {
+  color-scheme: light;
+  background: #f8fafc !important;
+  color: #0f172a !important;
+}
+
+.light-theme [class*="bg-slate-950"] {
+  background-color: #f8fafc !important;
+}
+
+.light-theme [class*="bg-slate-900"] {
+  background-color: #ffffff !important;
+}
+
+.light-theme [class*="bg-slate-800"] {
+  background-color: #e2e8f0 !important;
+}
+
+.light-theme [class*="bg-slate-700"] {
+  background-color: #cbd5e1 !important;
+}
+
+.light-theme [class*="border-slate-900"],
+.light-theme [class*="border-slate-800"],
+.light-theme [class*="border-slate-700"] {
+  border-color: #cbd5e1 !important;
+}
+
+.light-theme [class*="text-white"],
+.light-theme [class*="text-slate-100"],
+.light-theme [class*="text-slate-200"] {
+  color: #0f172a !important;
+}
+
+.light-theme [class*="text-slate-300"] {
+  color: #334155 !important;
+}
+
+.light-theme [class*="text-slate-400"] {
+  color: #475569 !important;
+}
+
+.light-theme [class*="text-slate-500"] {
+  color: #64748b !important;
+}
+
+.light-theme input,
+.light-theme select,
+.light-theme textarea {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+}
+
+.light-theme option {
+  background: #ffffff !important;
+  color: #0f172a !important;
+}
+
+.light-theme [class*="shadow-blue-950"] {
+  --tw-shadow-color: rgba(15, 23, 42, 0.12) !important;
+}

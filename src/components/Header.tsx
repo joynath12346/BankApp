@@ -1,7 +1,7 @@
 import React from 'react';
 import { useBank } from '../context/BankContext';
 import { UserRole } from '../types/bank';
-import { ArrowLeftRight, LogOut, Plus, RefreshCw } from 'lucide-react';
+import { ArrowLeftRight, LogOut, Moon, Plus, RefreshCw, Sun } from 'lucide-react';
 
 interface HeaderProps {
   currentTab: string;
@@ -10,6 +10,8 @@ interface HeaderProps {
   onOpenNewAccountModal: () => void;
   onLogout: () => void;
   isCustomerSession?: boolean;
+  theme: 'light' | 'dark';
+  onToggleTheme: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -18,7 +20,9 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenTransferModal,
   onOpenNewAccountModal,
   onLogout,
-  isCustomerSession = false
+  isCustomerSession = false,
+  theme,
+  onToggleTheme
 }) => {
   const { currentRole, setCurrentRole, amlAlerts, accounts, activeCustomerAccountId, setActiveCustomerAccountId, resetDemoData, isDbConnected, dbSyncStatus } = useBank();
 
@@ -172,6 +176,14 @@ export const Header: React.FC<HeaderProps> = ({
           className="p-1.5 text-slate-400 hover:text-red-300 rounded hover:bg-red-500/10 transition-colors cursor-pointer"
         >
           <LogOut className="w-3.5 h-3.5" />
+        </button>
+
+        <button
+          onClick={onToggleTheme}
+          title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+          className="p-1.5 text-slate-400 hover:text-blue-400 rounded hover:bg-slate-800/60 transition-colors cursor-pointer"
+        >
+          {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
         </button>
       </div>
     </header>
