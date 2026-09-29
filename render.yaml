@@ -17,8 +17,7 @@ services:
         value: "False"
       - key: DJANGO_SECRET_KEY
         generateValue: true
-
-      - type: static
+  - type: static
     name: aegis-bank-frontend
     buildCommand: npm ci && npm run build
     staticPublishPath: dist
