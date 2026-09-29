@@ -1,6 +1,7 @@
 import React, { FormEvent, useEffect, useState } from 'react';
-import { Building2, LockKeyhole, Moon, Sun, UserPlus } from 'lucide-react';
+import { Building2, Globe2, LockKeyhole, Moon, Sun, UserPlus } from 'lucide-react';
 import { BankProvider, useBank } from './context/BankContext';
+import { LanguageProvider, useLanguage } from './context/LanguageContext';
 import { Header } from './components/Header';
 import { DashboardOverview } from './components/DashboardOverview';
 import { AccountsManagement } from './components/AccountsManagement';
@@ -55,6 +56,7 @@ function readAuthSession(): AuthSession | null {
 
 function AccessPortal({ onLogin, theme, onToggleTheme }: { onLogin: (session: AuthSession) => void; theme: Theme; onToggleTheme: () => void }) {
   const { createAccount } = useBank();
+  const { toggleLanguage, t } = useLanguage();
   const [mode, setMode] = useState<'login' | 'register'>('login');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -123,6 +125,14 @@ function AccessPortal({ onLogin, theme, onToggleTheme }: { onLogin: (session: Au
     <main className={`${theme === 'light' ? 'light-theme' : ''} min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center p-6 relative`}>
       <button
         type="button"
+        onClick={toggleLanguage}
+        title="Switch language"
+        className="absolute right-16 top-5 flex items-center gap-1.5 rounded-lg border border-slate-700 bg-slate-900 px-3 py-2.5 text-xs font-semibold text-slate-300 transition hover:text-white"
+      >
+        <Globe2 className="h-4 w-4" /> {t('language')}
+      </button>
+      <button
+        type="button"
         onClick={onToggleTheme}
         title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
         className="absolute right-5 top-5 rounded-lg border border-slate-700 bg-slate-900 p-2.5 text-slate-300 transition hover:text-white"
@@ -136,24 +146,24 @@ function AccessPortal({ onLogin, theme, onToggleTheme }: { onLogin: (session: Au
           </div>
           <div>
             <h1 className="text-xl font-bold tracking-tight text-white">BanglaBank</h1>
-            <p className="text-sm text-slate-400">Secure banking portal</p>
+            <p className="text-sm text-slate-400">{t('securePortal')}</p>
           </div>
         </div>
 
         <div className="mb-6 grid grid-cols-2 rounded-lg bg-slate-950 p-1">
-          <button type="button" onClick={() => { setMode('login'); setError(''); }} className={`rounded-md px-3 py-2 text-sm font-semibold transition ${mode === 'login' ? 'bg-slate-800 text-white' : 'text-slate-400 hover:text-white'}`}>Sign in</button>
-          <button type="button" onClick={() => { setMode('register'); setError(''); }} className={`rounded-md px-3 py-2 text-sm font-semibold transition ${mode === 'register' ? 'bg-slate-800 text-white' : 'text-slate-400 hover:text-white'}`}>Register</button>
+          <button type="button" onClick={() => { setMode('login'); setError(''); }} className={`rounded-md px-3 py-2 text-sm font-semibold transition ${mode === 'login' ? 'bg-slate-800 text-white' : 'text-slate-400 hover:text-white'}`}>{t('signIn')}</button>
+          <button type="button" onClick={() => { setMode('register'); setError(''); }} className={`rounded-md px-3 py-2 text-sm font-semibold transition ${mode === 'register' ? 'bg-slate-800 text-white' : 'text-slate-400 hover:text-white'}`}>{t('register')}</button>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
           {mode === 'register' && (
             <>
               <div>
-                <label htmlFor="customer-name" className="mb-2 block text-xs font-semibold uppercase tracking-wider text-slate-400">Full name</label>
+                <label htmlFor="customer-name" className="mb-2 block text-xs font-semibold uppercase tracking-wider text-slate-400">{t('fullName')}</label>
                 <input id="customer-name" value={name} onChange={event => setName(event.target.value)} autoComplete="name" className="w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20" placeholder="Your full name" />
               </div>
               <div>
-                <label htmlFor="customer-email" className="mb-2 block text-xs font-semibold uppercase tracking-wider text-slate-400">Email</label>
+                <label htmlFor="customer-email" className="mb-2 block text-xs font-semibold uppercase tracking-wider text-slate-400">{t('email')}</label>
                 <input id="customer-email" type="email" value={email} onChange={event => setEmail(event.target.value)} autoComplete="email" className="w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20" placeholder="you@example.com" />
               </div>
             </>
@@ -161,7 +171,7 @@ function AccessPortal({ onLogin, theme, onToggleTheme }: { onLogin: (session: Au
           {mode === 'login' && (
             <div>
               <label htmlFor="login-id" className="mb-2 block text-xs font-semibold uppercase tracking-wider text-slate-400">
-                Admin ID or customer email
+                {t('loginId')}
               </label>
               <input
                 id="login-id"
@@ -177,7 +187,7 @@ function AccessPortal({ onLogin, theme, onToggleTheme }: { onLogin: (session: Au
 
           <div>
             <label htmlFor="login-password" className="mb-2 block text-xs font-semibold uppercase tracking-wider text-slate-400">
-              Password
+              {t('password')}
             </label>
             <input
               id="login-password"
@@ -201,7 +211,7 @@ function AccessPortal({ onLogin, theme, onToggleTheme }: { onLogin: (session: Au
             className="flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-400/50"
           >
             {mode === 'login' ? <LockKeyhole className="h-4 w-4" /> : <UserPlus className="h-4 w-4" />}
-            {mode === 'login' ? 'Sign in' : 'Create customer account'}
+            {mode === 'login' ? t('signIn') : t('createAccount')}
           </button>
         </form>
       </div>
@@ -417,9 +427,11 @@ function BankPortalContent({ session, onLogout, theme, onToggleTheme }: { sessio
 
 export default function App() {
   return (
-    <BankProvider>
-      <AuthenticatedApplication />
-    </BankProvider>
+    <LanguageProvider>
+      <BankProvider>
+        <AuthenticatedApplication />
+      </BankProvider>
+    </LanguageProvider>
   );
 }
 

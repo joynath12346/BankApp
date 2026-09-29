@@ -1,7 +1,8 @@
 import React from 'react';
 import { useBank } from '../context/BankContext';
 import { UserRole } from '../types/bank';
-import { ArrowLeftRight, LogOut, Moon, Plus, RefreshCw, Sun } from 'lucide-react';
+import { ArrowLeftRight, Globe2, LogOut, Moon, Plus, RefreshCw, Sun } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 
 interface HeaderProps {
   currentTab: string;
@@ -25,17 +26,18 @@ export const Header: React.FC<HeaderProps> = ({
   onToggleTheme
 }) => {
   const { currentRole, setCurrentRole, amlAlerts, accounts, activeCustomerAccountId, setActiveCustomerAccountId, resetDemoData, isDbConnected, dbSyncStatus } = useBank();
+  const { t, toggleLanguage } = useLanguage();
 
   const pendingAlertCount = amlAlerts.filter(a => a.status === 'investigating').length;
 
   const navItems = [
-    { id: 'overview', label: 'Overview' },
-    { id: 'accounts', label: 'Accounts' },
-    { id: 'transactions', label: 'Ledger & Clearing' },
-    { id: 'loans', label: 'Credit Facilities' },
-    { id: 'compliance', label: 'Risk & AML' },
-    { id: 'cards', label: 'Card Fleet' },
-    { id: 'vault', label: 'Vault & FX' }
+    { id: 'overview', label: t('overview') },
+    { id: 'accounts', label: t('accounts') },
+    { id: 'transactions', label: t('ledger') },
+    { id: 'loans', label: t('credit') },
+    { id: 'compliance', label: t('risk') },
+    { id: 'cards', label: t('cards') },
+    { id: 'vault', label: t('vault') }
   ];
 
   return (
@@ -51,7 +53,7 @@ export const Header: React.FC<HeaderProps> = ({
             BanglaBank
           </span>
         </button>
-        <span className="text-xs text-slate-500 hidden sm:inline-block">· Institutional Core Banking</span>
+        <span className="text-xs text-slate-500 hidden sm:inline-block">· {t('coreBanking')}</span>
         {isDbConnected && (
           <span className="hidden xl:inline-flex items-center gap-1.5 text-[11px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block animate-pulse" />
@@ -93,7 +95,7 @@ export const Header: React.FC<HeaderProps> = ({
       <div className="flex items-center gap-3">
         {/* Role Switcher */}
         {!isCustomerSession && <div className="flex items-center gap-2 bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs">
-          <span className="text-slate-400 text-[11px] uppercase tracking-wider hidden sm:inline">Role:</span>
+          <span className="text-slate-400 text-[11px] uppercase tracking-wider hidden sm:inline">{t('role')}:</span>
           <select
             value={currentRole}
             onChange={(e) => {
@@ -107,10 +109,10 @@ export const Header: React.FC<HeaderProps> = ({
             }}
             className="bg-transparent text-slate-200 text-xs font-medium focus:outline-none cursor-pointer"
           >
-            <option value="director" className="bg-slate-900 text-white">Branch Director (Executive)</option>
-            <option value="teller" className="bg-slate-900 text-white">Head Teller / Operations</option>
-            <option value="compliance" className="bg-slate-900 text-white">Risk & AML Officer</option>
-            <option value="client" className="bg-slate-900 text-white">Customer Portal View</option>
+            <option value="director" className="bg-slate-900 text-white">{t('director')}</option>
+            <option value="teller" className="bg-slate-900 text-white">{t('teller')}</option>
+            <option value="compliance" className="bg-slate-900 text-white">{t('compliance')}</option>
+            <option value="client" className="bg-slate-900 text-white">{t('customer')}</option>
           </select>
         </div>}
 
@@ -140,7 +142,7 @@ export const Header: React.FC<HeaderProps> = ({
               className="px-3 py-1.5 text-xs font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-500 transition-colors whitespace-nowrap flex items-center gap-1.5 shadow-sm shadow-blue-500/10 cursor-pointer"
             >
               <ArrowLeftRight className="w-3.5 h-3.5" />
-              <span>Transfer</span>
+              <span>{t('transfer')}</span>
             </button>
 
             <button
@@ -148,7 +150,7 @@ export const Header: React.FC<HeaderProps> = ({
               className="hidden sm:flex px-3 py-1.5 text-xs font-medium text-slate-200 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg transition-colors whitespace-nowrap items-center gap-1.5 cursor-pointer"
             >
               <Plus className="w-3.5 h-3.5" />
-              <span>New Account</span>
+              <span>{t('newAccount')}</span>
             </button>
           </>
         ) : (
@@ -157,7 +159,7 @@ export const Header: React.FC<HeaderProps> = ({
             className="px-3 py-1.5 text-xs font-medium text-white bg-emerald-600 rounded-lg hover:bg-emerald-500 transition-colors whitespace-nowrap flex items-center gap-1.5 cursor-pointer"
           >
             <ArrowLeftRight className="w-3.5 h-3.5" />
-            <span>Send Money</span>
+            <span>{t('sendMoney')}</span>
           </button>
         )}
 
@@ -184,6 +186,15 @@ export const Header: React.FC<HeaderProps> = ({
           className="p-1.5 text-slate-400 hover:text-blue-400 rounded hover:bg-slate-800/60 transition-colors cursor-pointer"
         >
           {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+        </button>
+
+        <button
+          onClick={toggleLanguage}
+          title="Switch language"
+          className="flex items-center gap-1 p-1.5 text-xs font-semibold text-slate-400 hover:text-blue-400 rounded hover:bg-slate-800/60 transition-colors cursor-pointer"
+        >
+          <Globe2 className="w-4 h-4" />
+          <span className="hidden xl:inline">{t('language')}</span>
         </button>
       </div>
     </header>
