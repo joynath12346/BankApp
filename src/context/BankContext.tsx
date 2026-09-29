@@ -164,7 +164,14 @@ export const BankProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const [vault, setVault] = useState<BranchVaultState>(() => {
     const saved = localStorage.getItem(STORAGE_KEYS.VAULT);
-    return saved ? JSON.parse(saved) : INITIAL_BRANCH_VAULT;
+    const loaded = saved ? JSON.parse(saved) : INITIAL_BRANCH_VAULT;
+    return {
+      ...INITIAL_BRANCH_VAULT,
+      ...loaded,
+      vaultCashUSD: loaded.vaultCashUSD ?? loaded.vaultCashUsd ?? INITIAL_BRANCH_VAULT.vaultCashUSD,
+      tellerDrawersCashUSD: loaded.tellerDrawersCashUSD ?? loaded.tellerDrawersCashUsd ?? INITIAL_BRANCH_VAULT.tellerDrawersCashUSD,
+      centralBankDepositUSD: loaded.centralBankDepositUSD ?? loaded.centralBankDepositUsd ?? INITIAL_BRANCH_VAULT.centralBankDepositUSD
+    };
   });
 
   const [exchangeRates, setExchangeRates] = useState<ExchangeRate[]>(INITIAL_EXCHANGE_RATES);

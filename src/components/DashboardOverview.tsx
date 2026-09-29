@@ -167,7 +167,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
             <Vault className="w-4 h-4 text-emerald-400" />
           </div>
           <div className="text-2xl font-bold tracking-tight text-white tabular-nums">
-            BDT {vault.vaultCashUSD.toLocaleString(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            BDT {Number(vault.vaultCashUSD || 0).toLocaleString(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </div>
           <div className="flex items-center gap-2 mt-2 text-xs text-slate-400">
             <span className="text-emerald-400 font-medium">LCR: 142%</span>
