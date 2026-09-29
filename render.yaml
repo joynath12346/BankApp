@@ -18,9 +18,8 @@ services:
       - key: DJANGO_SECRET_KEY
         generateValue: true
 
-  - type: web
+      - type: static
     name: aegis-bank-frontend
-    runtime: static
     buildCommand: npm ci && npm run build
     staticPublishPath: dist
     envVars:
@@ -29,7 +28,6 @@ services:
           type: web
           name: aegis-bank-api
           property: host
-          envVarKey: RENDER_EXTERNAL_HOSTNAME
 
 databases:
   - name: aegis-bank-db
