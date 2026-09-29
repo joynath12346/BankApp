@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { Transaction } from '../types/bank';
 import { useLanguage } from '../context/LanguageContext';
+import { motion } from 'motion/react';
 
 interface DashboardOverviewProps {
   onSelectTab: (tab: string) => void;
@@ -69,9 +70,19 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
   const savingsPct = 100 - escrowPct - checkingPct;
 
   return (
-    <div className="space-y-6">
+    <motion.div
+      className="space-y-6"
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.45, ease: 'easeOut' }}
+    >
       {/* Top Banner: Headquarters & Operational Context */}
-      <div className="relative overflow-hidden rounded-xl border border-slate-800 bg-slate-900/60 p-6">
+      <motion.div
+        className="relative overflow-hidden rounded-xl border border-slate-800 bg-slate-900/60 p-6"
+        initial={{ opacity: 0, scale: 0.985 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.4, delay: 0.08 }}
+      >
         <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2 text-xs font-medium text-slate-400 mb-1">
@@ -108,12 +119,17 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
 
         {/* Subtle decorative background gradient */}
         <div className="absolute top-0 right-0 -mt-8 -mr-8 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl pointer-events-none" />
-      </div>
+      </motion.div>
 
       {/* KPI Cards Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <motion.div
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"
+        initial="hidden"
+        animate="show"
+        variants={{ hidden: {}, show: { transition: { staggerChildren: 0.07, delayChildren: 0.16 } } }}
+      >
         {/* Total Deposits */}
-        <div className="bg-slate-900/80 border border-slate-800 rounded-xl p-4">
+        <motion.div variants={{ hidden: { opacity: 0, y: 10 }, show: { opacity: 1, y: 0 } }} transition={{ duration: 0.3 }} className="bg-slate-900/80 border border-slate-800 rounded-xl p-4">
           <div className="flex items-center justify-between text-xs text-slate-400 mb-1">
             <span>{t('totalDeposits')}</span>
             <Landmark className="w-4 h-4 text-blue-400" />
@@ -126,10 +142,10 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
             <span aria-hidden="true">·</span>
             <span>{accounts.length.toLocaleString(locale)} {t('activeAccounts')}</span>
           </div>
-        </div>
+        </motion.div>
 
         {/* Credit Book Portfolio */}
-        <div className="bg-slate-900/80 border border-slate-800 rounded-xl p-4">
+        <motion.div variants={{ hidden: { opacity: 0, y: 10 }, show: { opacity: 1, y: 0 } }} transition={{ duration: 0.3 }} className="bg-slate-900/80 border border-slate-800 rounded-xl p-4">
           <div className="flex items-center justify-between text-xs text-slate-400 mb-1">
             <span>{t('grossLoanBook')}</span>
             <BadgeDollarSign className="w-4 h-4 text-indigo-400" />
@@ -142,10 +158,10 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
             <span aria-hidden="true">·</span>
             <span>{t('nplRatio')}: {language === 'bn' ? '০.১২' : '0.12'}%</span>
           </div>
-        </div>
+        </motion.div>
 
         {/* Branch Vault & Central Reserve */}
-        <div className="bg-slate-900/80 border border-slate-800 rounded-xl p-4">
+        <motion.div variants={{ hidden: { opacity: 0, y: 10 }, show: { opacity: 1, y: 0 } }} transition={{ duration: 0.3 }} className="bg-slate-900/80 border border-slate-800 rounded-xl p-4">
           <div className="flex items-center justify-between text-xs text-slate-400 mb-1">
             <span>{t('branchVault')}</span>
             <Vault className="w-4 h-4 text-emerald-400" />
@@ -158,10 +174,10 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
             <span aria-hidden="true">·</span>
             <span>{t('audited')} {vault.lastAuditedAt.slice(11, 16)}</span>
           </div>
-        </div>
+        </motion.div>
 
         {/* Daily Clearing Volume & Compliance */}
-        <div className="bg-slate-900/80 border border-slate-800 rounded-xl p-4">
+        <motion.div variants={{ hidden: { opacity: 0, y: 10 }, show: { opacity: 1, y: 0 } }} transition={{ duration: 0.3 }} className="bg-slate-900/80 border border-slate-800 rounded-xl p-4">
           <div className="flex items-center justify-between text-xs text-slate-400 mb-1">
             <span>{t('dailyClearing')}</span>
             <TrendingUp className="w-4 h-4 text-amber-400" />
@@ -181,11 +197,16 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
             <span aria-hidden="true">·</span>
             <span>{transactions.length.toLocaleString(locale)} {t('totalTransactions')}</span>
           </div>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
 
       {/* Middle Row: Deposit Composition & Core Banking Operations Quick Bar */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <motion.div
+        className="grid grid-cols-1 lg:grid-cols-3 gap-6"
+        initial={{ opacity: 0, y: 14 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.4 }}
+      >
         {/* Deposit Allocation breakdown */}
         <div className="bg-slate-900/80 border border-slate-800 rounded-xl p-5">
           <div className="flex items-center justify-between mb-4">
@@ -321,10 +342,15 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
             </button>
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* Recent Ledger Transactions Feed */}
-      <div className="bg-slate-900/80 border border-slate-800 rounded-xl overflow-hidden">
+      <motion.div
+        className="bg-slate-900/80 border border-slate-800 rounded-xl overflow-hidden"
+        initial={{ opacity: 0, y: 14 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.52 }}
+      >
         <div className="px-6 py-4 border-b border-slate-800 flex items-center justify-between">
           <div>
             <h2 className="text-sm font-semibold text-white tracking-wide">{t('liveJournal')}</h2>
@@ -414,7 +440,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
             </tbody>
           </table>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 };
