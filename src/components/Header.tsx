@@ -38,7 +38,7 @@ export const Header: React.FC<HeaderProps> = ({
     { id: 'compliance', label: t('risk') },
     { id: 'cards', label: t('cards') },
     { id: 'vault', label: t('vault') }
-    ,{ id: 'reports', label: t('reports') }
+    ,{ id: 'reports', label: t('reports') }, { id: 'audit', label: t('auditLogs') }
   ];
 
   return (

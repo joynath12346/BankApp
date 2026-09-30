@@ -13,6 +13,7 @@ import { CardsManagement } from './components/CardsManagement';
 import { BranchVaultFx } from './components/BranchVaultFx';
 import { CustomerPortalView } from './components/CustomerPortalView';
 import { ReportsAnalytics } from './components/ReportsAnalytics';
+import { AuditLogs } from './components/AuditLogs';
 
 // Modals
 import { TransferModal } from './components/modals/TransferModal';
@@ -337,6 +338,7 @@ function BankPortalContent({ session, onLogout, theme, onToggleTheme }: { sessio
             {currentTab === 'vault' && <BranchVaultFx />}
 
             {currentTab === 'reports' && <ReportsAnalytics />}
+            {currentTab === 'audit' && <AuditLogs />}
 
           </>
         )}
