@@ -6,7 +6,8 @@ from .models import (
     BankCard,
     AMLAlert,
     BranchVault,
-    ExchangeRate
+    ExchangeRate,
+    AuditLog
 )
 
 class BankAccountSerializer(serializers.ModelSerializer):
@@ -45,6 +46,7 @@ class LoanApplicationSerializer(serializers.ModelSerializer):
         model = LoanApplication
         fields = '__all__'
         read_only_fields = ['id', 'created_at']
+        extra_kwargs = {'account': {'required': False}}
 
 
 class BankCardSerializer(serializers.ModelSerializer):
@@ -75,3 +77,10 @@ class ExchangeRateSerializer(serializers.ModelSerializer):
     class Meta:
         model = ExchangeRate
         fields = '__all__'
+
+
+class AuditLogSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AuditLog
+        fields = ['id', 'created_at', 'actor_name', 'role', 'action', 'resource_type', 'resource_id', 'status', 'details', 'ip_address']
+        read_only_fields = fields

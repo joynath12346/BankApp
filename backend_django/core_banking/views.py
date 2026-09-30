@@ -13,7 +13,8 @@ from .models import (
     BankCard,
     AMLAlert,
     BranchVault,
-    ExchangeRate
+    ExchangeRate,
+    AuditLog
 )
 from .serializers import (
     BankAccountSerializer,
@@ -23,13 +24,34 @@ from .serializers import (
     BankCardSerializer,
     AMLAlertSerializer,
     BranchVaultSerializer,
-    ExchangeRateSerializer
+    ExchangeRateSerializer,
+    AuditLogSerializer
 )
 from .services import BankingClearingService, LoanUnderwritingService
+from .auth_views import record_audit
+from .permissions import (
+    user_role, AccountPermission, TransactionPermission, TransferPermission,
+    LoanPermission, CardPermission, CompliancePermission, VaultPermission,
+    ReadAuthenticatedPermission, AuditPermission,
+)
 
 class BankAccountViewSet(viewsets.ModelViewSet):
     queryset = BankAccount.objects.all()
     serializer_class = BankAccountSerializer
+    permission_classes = [AccountPermission]
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        profile = getattr(self.request.user, 'bank_profile', None)
+        return qs.filter(pk=profile.account_id) if user_role(self.request.user) == 'customer' and profile else qs
+
+    def perform_create(self, serializer):
+        account = serializer.save()
+        record_audit(self.request, 'create', 'account', account.pk)
+
+    def perform_update(self, serializer):
+        account = serializer.save()
+        record_audit(self.request, 'update', 'account', account.pk)
 
     @action(detail=True, methods=['post'])
     def deposit(self, request, pk=None):
@@ -59,6 +81,7 @@ class BankAccountViewSet(viewsets.ModelViewSet):
             status="settled",
             memo=memo
         )
+        record_audit(request, 'deposit', 'account', account.pk, {'amount': str(amount), 'transaction_id': tx.pk})
 
         return Response({
             'message': 'Deposit successful',
@@ -96,6 +119,7 @@ class BankAccountViewSet(viewsets.ModelViewSet):
             status="settled",
             memo=memo
         )
+        record_audit(request, 'withdraw', 'account', account.pk, {'amount': str(amount), 'transaction_id': tx.pk})
 
         return Response({
             'message': 'Withdrawal successful',
@@ -110,15 +134,20 @@ class BankAccountViewSet(viewsets.ModelViewSet):
         account.status = 'active' if account.status == 'frozen' else 'frozen'
         account.notes += f"\n[Status changed to {account.status}: {reason}]"
         account.save()
+        record_audit(request, 'change_status', 'account', account.pk, {'status': account.status, 'reason': reason})
         return Response({'status': account.status, 'message': f'Account {account.status}'})
 
 
 class TransactionViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Transaction.objects.all()
     serializer_class = TransactionSerializer
+    permission_classes = [TransactionPermission]
 
     def get_queryset(self):
         qs = super().get_queryset()
+        profile = getattr(self.request.user, 'bank_profile', None)
+        if user_role(self.request.user) == 'customer' and profile:
+            qs = qs.filter(source_account_id=profile.account_id)
         acc_id = self.request.query_params.get('account_id')
         if acc_id:
             qs = qs.filter(source_account_id=acc_id)
@@ -126,12 +155,17 @@ class TransactionViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class TransferExecutionAPIView(APIView):
+    permission_classes = [TransferPermission]
+
     def post(self, request):
         serializer = TransferExecutionSerializer(data=request.data)
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         data = serializer.validated_data
+        profile = getattr(request.user, 'bank_profile', None)
+        if user_role(request.user) == 'customer' and (not profile or data['source_account_id'] != profile.account_id):
+            return Response({'error': 'Customers may transfer only from their own account.'}, status=status.HTTP_403_FORBIDDEN)
         try:
             tx = BankingClearingService.process_transfer(
                 source_account_id=data['source_account_id'],
@@ -144,6 +178,7 @@ class TransferExecutionAPIView(APIView):
                 target_account_number=data.get('target_account_number', ''),
                 counterparty_bank=data.get('counterparty_bank', '')
             )
+            record_audit(request, 'transfer', 'transaction', tx.pk, {'amount': str(data['amount']), 'source_account_id': data['source_account_id']})
             return Response({
                 'message': 'Transfer processed successfully',
                 'transaction': TransactionSerializer(tx).data
@@ -155,6 +190,17 @@ class TransferExecutionAPIView(APIView):
 class LoanApplicationViewSet(viewsets.ModelViewSet):
     queryset = LoanApplication.objects.all()
     serializer_class = LoanApplicationSerializer
+    permission_classes = [LoanPermission]
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        profile = getattr(self.request.user, 'bank_profile', None)
+        return qs.filter(account_id=profile.account_id) if user_role(self.request.user) == 'customer' and profile else qs
+
+    def perform_create(self, serializer):
+        profile = getattr(self.request.user, 'bank_profile', None)
+        loan = serializer.save(account=profile.account) if user_role(self.request.user) == 'customer' and profile else serializer.save()
+        record_audit(self.request, 'create', 'loan', loan.pk)
 
     @action(detail=True, methods=['post'])
     def approve(self, request, pk=None):
@@ -165,6 +211,7 @@ class LoanApplicationViewSet(viewsets.ModelViewSet):
         loan.approved_at = timezone.now().date()
         loan.reviewed_by = request.data.get('reviewer', 'Senior Underwriting Officer')
         loan.save()
+        record_audit(request, 'approve', 'loan', loan.pk, {'approved_amount': str(loan.approved_amount)})
         return Response(LoanApplicationSerializer(loan).data)
 
     @action(detail=True, methods=['post'])
@@ -198,6 +245,7 @@ class LoanApplicationViewSet(viewsets.ModelViewSet):
             fee=Decimal('250.00'),
             memo=f"Disbursement of {loan.loan_number} ({loan.purpose})"
         )
+        record_audit(request, 'disburse', 'loan', loan.pk, {'amount': str(disburse_amount), 'transaction_id': tx.pk})
 
         return Response({
             'message': 'Loan disbursed successfully to borrower account',
@@ -209,18 +257,26 @@ class LoanApplicationViewSet(viewsets.ModelViewSet):
 class BankCardViewSet(viewsets.ModelViewSet):
     queryset = BankCard.objects.all()
     serializer_class = BankCardSerializer
+    permission_classes = [CardPermission]
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        profile = getattr(self.request.user, 'bank_profile', None)
+        return qs.filter(account_id=profile.account_id) if user_role(self.request.user) == 'customer' and profile else qs
 
     @action(detail=True, methods=['post'])
     def toggle_lock(self, request, pk=None):
         card = self.get_object()
         card.status = 'locked' if card.status == 'active' else 'active'
         card.save()
+        record_audit(request, 'toggle_lock', 'card', card.pk, {'status': card.status})
         return Response({'status': card.status, 'message': f'Card is now {card.status}'})
 
 
 class AMLAlertViewSet(viewsets.ModelViewSet):
     queryset = AMLAlert.objects.all()
     serializer_class = AMLAlertSerializer
+    permission_classes = [CompliancePermission]
 
     @action(detail=True, methods=['post'])
     def resolve(self, request, pk=None):
@@ -234,6 +290,7 @@ class AMLAlertViewSet(viewsets.ModelViewSet):
         alert.status = action_decision
         alert.notes += f"\n[Resolved as {action_decision.upper()}: {notes}]"
         alert.save()
+        record_audit(request, 'resolve', 'aml_alert', alert.pk, {'decision': action_decision})
 
         if action_decision == 'account_frozen':
             acc = alert.account
@@ -245,6 +302,8 @@ class AMLAlertViewSet(viewsets.ModelViewSet):
 
 
 class BranchVaultAPIView(APIView):
+    permission_classes = [VaultPermission]
+
     def get(self, request):
         vault, _ = BranchVault.objects.get_or_create(branch_code="NYC-01")
         return Response(BranchVaultSerializer(vault).data)
@@ -260,6 +319,7 @@ class BranchVaultAPIView(APIView):
             vault.auditor_name = auditor
             vault.daily_eod_reconciled = True
             vault.save()
+            record_audit(request, 'reconcile', 'branch_vault', vault.pk, {'counted_cash': str(counted_cash), 'auditor': auditor})
 
         return Response({
             'message': 'Daily EOD Vault Reconciled',
@@ -270,3 +330,20 @@ class BranchVaultAPIView(APIView):
 class ExchangeRateViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = ExchangeRate.objects.all()
     serializer_class = ExchangeRateSerializer
+    permission_classes = [ReadAuthenticatedPermission]
+
+
+class AuditLogViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = AuditLog.objects.select_related('actor').all()
+    serializer_class = AuditLogSerializer
+    permission_classes = [AuditPermission]
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        action_name = self.request.query_params.get('action')
+        actor = self.request.query_params.get('actor')
+        if action_name:
+            qs = qs.filter(action=action_name)
+        if actor:
+            qs = qs.filter(actor_name__icontains=actor)
+        return qs
