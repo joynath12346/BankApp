@@ -3,6 +3,7 @@ from decimal import Decimal
 from django.db import models
 from django.utils import timezone
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.conf import settings
 
 
 def generate_account_id():
@@ -290,3 +291,39 @@ class ExchangeRate(models.Model):
 
     def __str__(self):
         return f"{self.code} ($ {self.rate_to_usd})"
+
+
+class UserProfile(models.Model):
+    ROLE_CHOICES = [
+        ('administrator', 'Administrator'),
+        ('bank_manager', 'Bank Manager'),
+        ('teller', 'Teller'),
+        ('compliance_officer', 'Compliance Officer'),
+        ('customer', 'Customer'),
+    ]
+
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='bank_profile')
+    role = models.CharField(max_length=32, choices=ROLE_CHOICES, default='customer', db_index=True)
+    account = models.ForeignKey(BankAccount, on_delete=models.SET_NULL, null=True, blank=True, related_name='portal_users')
+
+    def __str__(self):
+        return f"{self.user.username} ({self.get_role_display()})"
+
+
+class AuditLog(models.Model):
+    actor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
+    actor_name = models.CharField(max_length=255)
+    role = models.CharField(max_length=32, blank=True)
+    action = models.CharField(max_length=100, db_index=True)
+    resource_type = models.CharField(max_length=100)
+    resource_id = models.CharField(max_length=100, blank=True)
+    status = models.CharField(max_length=32, default='success')
+    details = models.JSONField(default=dict, blank=True)
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.created_at}: {self.actor_name} {self.action} {self.resource_type}"
