@@ -9,9 +9,7 @@ services:
     healthCheckPath: /api/v1/
     envVars:
       - key: DATABASE_URL
-        fromDatabase:
-          name: aegis-bank-db
-          property: connectionString
+        sync: false
       - key: DATABASE_SSL_REQUIRE
         value: "True"
       - key: DJANGO_DEBUG
@@ -29,7 +27,3 @@ services:
           type: web
           name: aegis-bank-api
           property: host
-
-databases:
-  - name: aegis-bank-db
-    plan: free

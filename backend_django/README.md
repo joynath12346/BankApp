@@ -44,9 +44,11 @@ pip install -r requirements.txt
 
 ### B. Database Migrations
 
-The backend uses PostgreSQL. Copy the PostgreSQL variables from the root
-`.env.example` into `backend_django/.env`, then create the configured database
-and user before running migrations.
+The backend uses PostgreSQL. For Neon, copy the pooled `DATABASE_URL` from the
+Neon **Connect** dialog into `backend_django/.env`. Keep
+`DATABASE_SSL_REQUIRE=True`. The `.env` file is ignored by Git and must never be
+committed. The individual `POSTGRES_*` variables in the root `.env.example` can
+instead be used with a conventional local PostgreSQL installation.
 
 ```bash
 # Generate and apply migrations
