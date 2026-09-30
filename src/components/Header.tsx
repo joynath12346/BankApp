@@ -1,8 +1,8 @@
 import React from 'react';
 import { useBank } from '../context/BankContext';
-import { UserRole } from '../types/bank';
 import { ArrowLeftRight, Globe2, LogOut, Moon, Plus, RefreshCw, Sun } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
+import { AppRole } from '../services/bankApi';
 
 interface HeaderProps {
   currentTab: string;
@@ -11,6 +11,7 @@ interface HeaderProps {
   onOpenNewAccountModal: () => void;
   onLogout: () => void;
   isCustomerSession?: boolean;
+  sessionRole: AppRole;
   theme: 'light' | 'dark';
   onToggleTheme: () => void;
 }
@@ -22,6 +23,7 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenNewAccountModal,
   onLogout,
   isCustomerSession = false,
+  sessionRole,
   theme,
   onToggleTheme
 }) => {
@@ -30,7 +32,7 @@ export const Header: React.FC<HeaderProps> = ({
 
   const pendingAlertCount = amlAlerts.filter(a => a.status === 'investigating').length;
 
-  const navItems = [
+  const allNavItems = [
     { id: 'overview', label: t('overview') },
     { id: 'accounts', label: t('accounts') },
     { id: 'transactions', label: t('ledger') },
@@ -40,6 +42,15 @@ export const Header: React.FC<HeaderProps> = ({
     { id: 'vault', label: t('vault') }
     ,{ id: 'reports', label: t('reports') }, { id: 'audit', label: t('auditLogs') }
   ];
+  const roleTabs: Record<AppRole, string[]> = {
+    administrator: allNavItems.map(item => item.id),
+    bank_manager: ['overview', 'accounts', 'transactions', 'loans', 'cards', 'vault', 'reports', 'audit'],
+    teller: ['overview', 'accounts', 'transactions', 'loans', 'cards', 'vault'],
+    compliance_officer: ['overview', 'accounts', 'transactions', 'compliance', 'reports', 'audit'],
+    customer: [],
+  };
+  const navItems = allNavItems.filter(item => roleTabs[sessionRole].includes(item.id));
+  const roleLabel = sessionRole.replaceAll('_', ' ');
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-slate-800 bg-slate-950/95 backdrop-blur px-6 py-3.5 flex items-center justify-between">
@@ -97,24 +108,7 @@ export const Header: React.FC<HeaderProps> = ({
         {/* Role Switcher */}
         {!isCustomerSession && <div className="flex items-center gap-2 bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs">
           <span className="text-slate-400 text-[11px] uppercase tracking-wider hidden sm:inline">{t('role')}:</span>
-          <select
-            value={currentRole}
-            onChange={(e) => {
-              const newRole = e.target.value as UserRole;
-              setCurrentRole(newRole);
-              if (newRole === 'client') {
-                setCurrentTab('client_portal');
-              } else if (currentTab === 'client_portal') {
-                setCurrentTab('overview');
-              }
-            }}
-            className="bg-transparent text-slate-200 text-xs font-medium focus:outline-none cursor-pointer"
-          >
-            <option value="director" className="bg-slate-900 text-white">{t('director')}</option>
-            <option value="teller" className="bg-slate-900 text-white">{t('teller')}</option>
-            <option value="compliance" className="bg-slate-900 text-white">{t('compliance')}</option>
-            <option value="client" className="bg-slate-900 text-white">{t('customer')}</option>
-          </select>
+          <span className="capitalize text-slate-200 text-xs font-medium">{roleLabel}</span>
         </div>}
 
         {/* If in client mode, quick account selector */}
@@ -138,21 +132,21 @@ export const Header: React.FC<HeaderProps> = ({
         {/* Primary Action Buttons */}
         {currentRole !== 'client' ? (
           <>
-            <button
+            {['administrator', 'bank_manager', 'teller'].includes(sessionRole) && <button
               onClick={onOpenTransferModal}
               className="px-3 py-1.5 text-xs font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-500 transition-colors whitespace-nowrap flex items-center gap-1.5 shadow-sm shadow-blue-500/10 cursor-pointer"
             >
               <ArrowLeftRight className="w-3.5 h-3.5" />
               <span>{t('transfer')}</span>
-            </button>
+            </button>}
 
-            <button
+            {['administrator', 'bank_manager', 'teller'].includes(sessionRole) && <button
               onClick={onOpenNewAccountModal}
               className="hidden sm:flex px-3 py-1.5 text-xs font-medium text-slate-200 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg transition-colors whitespace-nowrap items-center gap-1.5 cursor-pointer"
             >
               <Plus className="w-3.5 h-3.5" />
               <span>{t('newAccount')}</span>
-            </button>
+            </button>}
           </>
         ) : (
           <button
