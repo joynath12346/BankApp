@@ -1,7 +1,8 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Download, FileText, History, Search } from 'lucide-react';
 import { useBank } from '../context/BankContext';
 import { useLanguage } from '../context/LanguageContext';
+import { loadAuditLogs } from '../services/bankApi';
 
 type AuditEntry = { id: string; timestamp: string; actor: string; action: string; resource: string; status: string; amount?: number };
 
@@ -10,10 +11,23 @@ export const AuditLogs: React.FC = () => {
   const { language } = useLanguage();
   const [query, setQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [serverEntries, setServerEntries] = useState<AuditEntry[]>([]);
   const locale = language === 'bn' ? 'bn-BD' : 'en-US';
   const money = (value: number) => `BDT ${value.toLocaleString(locale, { maximumFractionDigits: 0 })}`;
 
+  useEffect(() => {
+    loadAuditLogs().then(records => setServerEntries(records.map(record => ({
+      id: `audit-${record.id}`,
+      timestamp: record.created_at,
+      actor: record.actor_name,
+      action: record.action.replaceAll('_', ' '),
+      resource: `${record.resource_type}:${record.resource_id}`,
+      status: record.status,
+    })))).catch(() => setServerEntries([]));
+  }, []);
+
   const entries = useMemo<AuditEntry[]>(() => {
+    if (serverEntries.length) return serverEntries;
     const transactionEntries = transactions.map(tx => ({
       id: `tx-${tx.id}`, timestamp: tx.timestamp, actor: tx.accountHolderName || 'System',
       action: tx.type.replaceAll('_', ' '), resource: tx.referenceNumber, status: tx.status, amount: tx.amount
@@ -23,7 +37,7 @@ export const AuditLogs: React.FC = () => {
       action: `loan ${loan.status.replaceAll('_', ' ')}`, resource: loan.loanNumber, status: loan.status, amount: loan.approvedAmount || loan.requestedAmount
     }));
     return [...transactionEntries, ...loanEntries].sort((a, b) => b.timestamp.localeCompare(a.timestamp));
-  }, [loans, transactions]);
+  }, [loans, serverEntries, transactions]);
 
   const filtered = entries.filter(entry => {
     const matchesQuery = `${entry.actor} ${entry.action} ${entry.resource} ${entry.status}`.toLowerCase().includes(query.toLowerCase());

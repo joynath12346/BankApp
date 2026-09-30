@@ -22,31 +22,13 @@ import { DepositWithdrawModal } from './components/modals/DepositWithdrawModal';
 import { TransactionReceiptModal } from './components/modals/TransactionReceiptModal';
 import { NewCardModal } from './components/modals/NewCardModal';
 import { BankAccount, Transaction } from './types/bank';
+import { AppRole, login, logout, registerCustomer } from './services/bankApi';
 
 const AUTH_SESSION_KEY = 'aegis_authenticated_user';
-const CUSTOMER_USERS_KEY = 'aegis_customer_users';
 const THEME_KEY = 'banglabank_theme';
 type Theme = 'light' | 'dark';
 
-type AuthSession =
-  | { kind: 'admin'; name: string }
-  | { kind: 'customer'; name: string; accountId: string };
-
-interface CustomerUser {
-  username: string;
-  password: string;
-  name: string;
-  email: string;
-  accountId: string;
-}
-
-function readCustomerUsers(): CustomerUser[] {
-  try {
-    return JSON.parse(localStorage.getItem(CUSTOMER_USERS_KEY) || '[]');
-  } catch {
-    return [];
-  }
-}
+type AuthSession = { kind: 'staff' | 'customer'; name: string; role: AppRole; accountId?: string };
 
 function readAuthSession(): AuthSession | null {
   try {
@@ -57,7 +39,6 @@ function readAuthSession(): AuthSession | null {
 }
 
 function AccessPortal({ onLogin, theme, onToggleTheme }: { onLogin: (session: AuthSession) => void; theme: Theme; onToggleTheme: () => void }) {
-  const { createAccount } = useBank();
   const { toggleLanguage, t } = useLanguage();
   const [mode, setMode] = useState<'login' | 'register'>('login');
   const [username, setUsername] = useState('');
@@ -65,62 +46,38 @@ function AccessPortal({ onLogin, theme, onToggleTheme }: { onLogin: (session: Au
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const normalizedUsername = username.trim().toLowerCase();
     const normalizedEmail = email.trim().toLowerCase();
 
     if (mode === 'register') {
-      if (!name.trim() || !normalizedEmail || password.length < 4) {
-        setError('Complete every field. Password must contain at least 4 characters.');
+      if (!name.trim() || !normalizedEmail || password.length < 8) {
+        setError('Complete every field. Password must contain at least 8 characters.');
         return;
       }
-      const users = readCustomerUsers();
-      if (users.some(user => user.username === normalizedEmail || user.email.toLowerCase() === normalizedEmail)) {
-        setError('That email address is already registered.');
-        return;
-      }
-      const account = createAccount({
-        accountHolderName: name.trim(),
-        accountHolderEmail: normalizedEmail,
-        accountHolderPhone: 'Not provided',
-        type: 'checking',
-        currency: 'BDT',
-        balance: 0,
-        notes: 'Customer self-registration account.'
-      });
-      const customer: CustomerUser = {
-        username: normalizedEmail,
-        password,
-        name: name.trim(),
-        email: normalizedEmail,
-        accountId: account.id
+    }
+    setSubmitting(true);
+    try {
+      const response = mode === 'register'
+        ? await registerCustomer(name.trim(), normalizedEmail, password)
+        : await login(normalizedUsername, password);
+      const session: AuthSession = {
+        kind: response.user.role === 'customer' ? 'customer' : 'staff',
+        name: response.user.name,
+        role: response.user.role,
+        accountId: response.user.account_id || undefined,
       };
-      localStorage.setItem(CUSTOMER_USERS_KEY, JSON.stringify([...users, customer]));
-      const session: AuthSession = { kind: 'customer', name: customer.name, accountId: customer.accountId };
       sessionStorage.setItem(AUTH_SESSION_KEY, JSON.stringify(session));
       setError('');
       onLogin(session);
-      return;
+    } catch (requestError) {
+      setError(requestError instanceof Error ? requestError.message : 'Sign in failed.');
+    } finally {
+      setSubmitting(false);
     }
-
-    let session: AuthSession | null = null;
-    if (normalizedUsername === 'admin' && password === 'admin') {
-      session = { kind: 'admin', name: 'Administrator' };
-    } else {
-      const customer = readCustomerUsers().find(
-        user => user.username === normalizedUsername && user.password === password
-      );
-      if (customer) session = { kind: 'customer', name: customer.name, accountId: customer.accountId };
-    }
-    if (!session) {
-      setError('Incorrect ID or password.');
-      return;
-    }
-    sessionStorage.setItem(AUTH_SESSION_KEY, JSON.stringify(session));
-    setError('');
-    onLogin(session);
   };
 
   return (
@@ -213,7 +170,7 @@ function AccessPortal({ onLogin, theme, onToggleTheme }: { onLogin: (session: Au
             className="flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-400/50"
           >
             {mode === 'login' ? <LockKeyhole className="h-4 w-4" /> : <UserPlus className="h-4 w-4" />}
-            {mode === 'login' ? t('signIn') : t('createAccount')}
+            {submitting ? 'Please wait…' : mode === 'login' ? t('signIn') : t('createAccount')}
           </button>
         </form>
       </div>
@@ -228,10 +185,10 @@ function BankPortalContent({ session, onLogout, theme, onToggleTheme }: { sessio
   useEffect(() => {
     if (session.kind === 'customer') {
       setCurrentRole('client');
-      setActiveCustomerAccountId(session.accountId);
+      if (session.accountId) setActiveCustomerAccountId(session.accountId);
       setCurrentTab('client_portal');
     } else {
-      setCurrentRole('director');
+      setCurrentRole(session.role === 'teller' ? 'teller' : session.role === 'compliance_officer' ? 'compliance' : 'director');
       setCurrentTab('overview');
     }
   }, [session, setActiveCustomerAccountId, setCurrentRole]);
@@ -276,6 +233,7 @@ function BankPortalContent({ session, onLogout, theme, onToggleTheme }: { sessio
         onOpenNewAccountModal={() => setIsNewAccountModalOpen(true)}
         onLogout={onLogout}
         isCustomerSession={session.kind === 'customer'}
+        sessionRole={session.role}
         theme={theme}
         onToggleTheme={onToggleTheme}
       />
@@ -452,9 +410,13 @@ function AuthenticatedApplication() {
     });
   };
 
-  if (!session) return <AccessPortal onLogin={setSession} theme={theme} onToggleTheme={toggleTheme} />;
+  if (!session) return <AccessPortal onLogin={(nextSession) => {
+    setSession(nextSession);
+    window.location.reload();
+  }} theme={theme} onToggleTheme={toggleTheme} />;
 
   const handleLogout = () => {
+    void logout().catch(() => undefined);
     sessionStorage.removeItem(AUTH_SESSION_KEY);
     setSession(null);
   };

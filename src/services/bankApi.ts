@@ -4,6 +4,11 @@ const configuredApiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:
 const apiOrigin = configuredApiUrl.startsWith('http') ? configuredApiUrl : `https://${configuredApiUrl}`;
 const API_BASE_URL = `${apiOrigin.replace(/\/$/, '')}${apiOrigin.endsWith('/api/v1') ? '' : '/api/v1'}`;
 
+export type AppRole = 'administrator' | 'bank_manager' | 'teller' | 'compliance_officer' | 'customer';
+export interface AuthUser { id: number; username: string; email: string; name: string; role: AppRole; account_id: string | null }
+export interface AuthResponse { token: string; user: AuthUser }
+export interface AuditRecord { id: number; created_at: string; actor_name: string; role: AppRole; action: string; resource_type: string; resource_id: string; status: string; details: Record<string, unknown>; ip_address?: string }
+
 function camelize(value: unknown): any {
   if (Array.isArray(value)) return value.map(camelize);
   if (!value || typeof value !== 'object') return value;
@@ -27,6 +32,26 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   if (!response.ok) throw new Error(`Bank API request failed (${response.status})`);
   const payload = await response.json();
   return camelize(payload) as T;
+}
+
+export async function login(identifier: string, password: string): Promise<AuthResponse> {
+  const response = await request<AuthResponse>('/auth/login/', { method: 'POST', body: JSON.stringify({ identifier, password }) });
+  localStorage.setItem('aegis_api_token', response.token);
+  return response;
+}
+
+export async function registerCustomer(name: string, email: string, password: string): Promise<AuthResponse> {
+  const response = await request<AuthResponse>('/auth/register/', { method: 'POST', body: JSON.stringify({ name, email, password }) });
+  localStorage.setItem('aegis_api_token', response.token);
+  return response;
+}
+
+export async function logout(): Promise<void> {
+  try { await request<void>('/auth/logout/', { method: 'POST' }); } finally { localStorage.removeItem('aegis_api_token'); }
+}
+
+export async function loadAuditLogs(): Promise<AuditRecord[]> {
+  return results(await request<AuditRecord[] | { results: AuditRecord[] }>('/audit-logs/'));
 }
 
 function results<T>(payload: T[] | { results?: T[] }): T[] {
